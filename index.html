@@ -1,0 +1,2672 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tutorial: Publicidad Cinematográfica con IA — ChatGPT + Google Flow Agent Mode</title>
+<style>
+/* ============================================================
+   VARIABLES Y BASE
+   ============================================================ */
+:root{
+  --fs: 16px;
+  --bg:        #0a0e1a;
+  --card:      #0f172a;
+  --accent:    #1e3a5f;
+  --text:      #e2e8f0;
+  --muted:     #94a3b8;
+  --border:    #1e293b;
+  --blue:      #38bdf8;
+  --purple:    #a78bfa;
+  --ok:        #34d399;
+  --warn:      #fbbf24;
+  --bad:       #f87171;
+  --shadow:    0 8px 24px rgba(0,0,0,.35);
+}
+html.light{
+  --bg:        #f1f5f9;
+  --card:      #ffffff;
+  --accent:    #dbeafe;
+  --text:      #0f172a;
+  --muted:     #475569;
+  --border:    #cbd5e1;
+  --blue:      #0369a1;
+  --purple:    #6d28d9;
+  --ok:        #047857;
+  --warn:      #b45309;
+  --bad:       #b91c1c;
+  --shadow:    0 8px 24px rgba(15,23,42,.10);
+}
+html{ font-size: var(--fs); scroll-behavior:smooth; }
+*{ box-sizing: border-box; }
+body{
+  margin:0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.68;
+  transition: background .25s ease, color .25s ease;
+  -webkit-text-size-adjust: 100%;
+}
+img, svg{ max-width:100%; }
+a{ color: var(--blue); }
+
+/* ============================================================
+   BARRA DE PROGRESO
+   ============================================================ */
+.progress-bar{
+  position: fixed; top:0; left:0; right:0; height:3px;
+  background: transparent; z-index: 70; pointer-events:none;
+}
+#progressFill{
+  height:100%; width:0%;
+  background: linear-gradient(90deg, var(--blue), var(--purple));
+  transition: width .1s linear;
+}
+
+/* ============================================================
+   TOOLBAR
+   ============================================================ */
+.toolbar{
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 18px 16px 6px;
+  display:flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.brand{
+  font-weight: 800;
+  letter-spacing: .5px;
+  font-size: .95rem;
+  color: var(--text);
+  margin-right: auto;
+  display:flex; align-items:center; gap:8px;
+}
+.brand .dot{
+  width:10px; height:10px; border-radius:50%;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  box-shadow: 0 0 10px var(--blue);
+}
+.tool-group{ display:flex; gap:6px; align-items:center; flex-wrap: wrap; }
+.tbtn{
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .18s, border-color .18s, transform .1s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.tbtn:hover{ border-color: var(--blue); }
+.tbtn:active{ transform: scale(.97); }
+.search-wrap{ position:relative; }
+#searchInput{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  padding: 7px 12px;
+  font-size: .85rem;
+  font-family: inherit;
+  width: 190px;
+  outline: none;
+}
+#searchInput:focus{ border-color: var(--blue); }
+#searchInfo{
+  font-size: .74rem;
+  color: var(--muted);
+  min-width: 62px;
+}
+
+/* ============================================================
+   PESTAÑAS
+   ============================================================ */
+.tabs{
+  position: sticky;
+  top: 3px;
+  z-index: 50;
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.tab{
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .4px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .18s ease;
+}
+.tab:hover{ color: var(--text); border-color: var(--blue); }
+.tab.active{
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue) inset;
+}
+html.light .tab.active{ color:#0b2545; }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+main{
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 22px 16px 90px;
+}
+.panel{ display:none; animation: fadeIn .35s ease; }
+.panel.active{ display:block; }
+@keyframes fadeIn{
+  from{ opacity:0; transform: translateY(8px); }
+  to{ opacity:1; transform:none; }
+}
+
+h1{ font-size: 1.85rem; line-height:1.22; margin:.2rem 0 .5rem; font-weight: 800; letter-spacing:-.5px; }
+h2{
+  font-size: 1.35rem; margin: 2rem 0 .8rem; font-weight: 800;
+  padding-bottom:.4rem; border-bottom: 1px solid var(--border);
+}
+h3{ font-size: 1.08rem; margin: 1.5rem 0 .5rem; font-weight: 700; color: var(--blue); }
+h4{ font-size: .96rem; margin: 1.1rem 0 .4rem; font-weight: 700; }
+p{ margin: .7rem 0; }
+ul, ol{ padding-left: 1.3rem; }
+li{ margin: .35rem 0; }
+.lead{ font-size: 1.05rem; color: var(--muted); }
+small{ color: var(--muted); }
+
+/* ============================================================
+   COMPONENTES
+   ============================================================ */
+.card{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  margin: 16px 0;
+  box-shadow: var(--shadow);
+}
+.card > :first-child{ margin-top:0; }
+.card > :last-child{ margin-bottom:0; }
+
+.box{
+  background: rgba(30,58,95,.28);
+  border: 1px solid var(--accent);
+  border-left: 4px solid var(--blue);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 14px 0;
+}
+html.light .box{ background: #eff6ff; }
+
+.box.warn{ border-left-color: var(--warn); background: rgba(251,191,36,.10); }
+html.light .box.warn{ background:#fffbeb; }
+.box.bad{ border-left-color: var(--bad); background: rgba(248,113,113,.10); }
+html.light .box.bad{ background:#fef2f2; }
+.box.ok{ border-left-color: var(--ok); background: rgba(52,211,153,.10); }
+html.light .box.ok{ background:#ecfdf5; }
+
+.tag{
+  display:inline-block;
+  background: var(--accent);
+  color: #cfe4ff;
+  border-radius: 999px;
+  padding: 3px 11px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .5px;
+  margin: 0 6px 6px 0;
+}
+html.light .tag{ color:#0b2545; }
+
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(215px,1fr));
+  gap: 12px;
+  margin: 14px 0;
+}
+.mini{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+}
+.mini h4{ margin: 0 0 .35rem; color: var(--blue); font-size: .92rem; }
+.mini p{ margin: 0; font-size: .86rem; color: var(--muted); }
+.mini .num{
+  display:inline-flex; align-items:center; justify-content:center;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--accent); color: #cfe4ff; font-weight: 800; font-size: .8rem;
+  margin-bottom: 6px;
+}
+html.light .mini .num{ color:#0b2545; }
+
+.steps{ counter-reset: st; list-style: none; padding-left: 0; margin: 14px 0; }
+.steps li{
+  counter-increment: st;
+  position: relative;
+  padding-left: 2.5rem;
+  margin: .75rem 0;
+}
+.steps li::before{
+  content: counter(st);
+  position: absolute; left: 0; top: .15rem;
+  width: 1.65rem; height: 1.65rem; border-radius: 50%;
+  background: var(--accent);
+  color: #cfe4ff;
+  border: 1px solid #2b4f7a;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .78rem; font-weight: 800;
+}
+html.light .steps li::before{ color:#0b2545; }
+.steps li b{ color: var(--text); }
+
+table{
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: .86rem;
+  overflow-x: auto;
+  display: block;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+thead{ background: var(--accent); }
+th, td{
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+th{ color: #dbeafe; font-weight: 700; font-size: .8rem; letter-spacing:.3px; white-space: nowrap; }
+html.light th{ color:#0b2545; }
+tbody tr:last-child td{ border-bottom: none; }
+tbody tr:nth-child(even){ background: rgba(30,58,95,.14); }
+html.light tbody tr:nth-child(even){ background:#f8fafc; }
+
+pre{
+  background: #060a14;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  overflow-x: auto;
+  font-size: .78rem;
+  line-height: 1.55;
+  color: #cbd5e1;
+  white-space: pre;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+html.light pre{ background:#0f172a; color:#e2e8f0; }
+code{
+  background: rgba(30,58,95,.45);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .84em;
+  color: #bae6fd;
+}
+html.light code{ background:#e2e8f0; color:#0f172a; }
+
+details{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0;
+  margin: 10px 0;
+  overflow: hidden;
+}
+details summary{
+  cursor: pointer;
+  padding: 12px 16px;
+  font-weight: 700;
+  font-size: .9rem;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+details summary::-webkit-details-marker{ display:none; }
+details summary::before{
+  content: "▸";
+  color: var(--blue);
+  font-size: 1rem;
+  transition: transform .2s;
+  display:inline-block;
+}
+details[open] summary::before{ transform: rotate(90deg); }
+details[open] summary{ border-bottom: 1px solid var(--border); }
+details .det-body{ padding: 12px 16px; }
+details .det-body > :first-child{ margin-top:0; }
+
+.copyBtn{
+  background: var(--accent);
+  color: #dbeafe;
+  border: 1px solid #2b4f7a;
+  border-radius: 9px;
+  padding: 7px 14px;
+  font-size: .78rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: .4px;
+  transition: background .18s, transform .1s;
+  min-height: 36px;
+}
+.copyBtn:hover{ background:#27496f; }
+.copyBtn:active{ transform: scale(.97); }
+.copyBtn.done{ background:#065f46; color:#d1fae5; border-color:#059669; }
+html.light .copyBtn{ background:#1e3a5f; color:#e2e8f0; }
+
+.ck-list{ list-style:none; padding-left:0; }
+.ck-list li{
+  display:flex; gap:10px; align-items:flex-start;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 7px 0;
+  background: var(--card);
+  font-size: .88rem;
+}
+.ck-list input[type=checkbox]{
+  width: 18px; height: 18px;
+  margin-top: 3px;
+  accent-color: var(--blue);
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+.ck-list input:checked + span{ color: var(--muted); text-decoration: line-through; }
+
+.ck-bar{
+  height: 10px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+  margin: 10px 0 6px;
+}
+.ck-bar > div{
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--blue), var(--purple));
+  transition: width .3s ease;
+}
+
+.hero-svg-mount{
+  width: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #0f172a;
+  border: 1px solid var(--border);
+  margin: 6px 0 14px;
+  min-height: 90px;
+}
+.hero-svg-mount svg{ display:block; width:100%; height:auto; }
+.hero-svg-mount img{ display:block; width:100%; height:auto; }
+.hero-caption{
+  text-align:center;
+  font-size: .8rem;
+  color: var(--muted);
+  margin: -6px 0 18px;
+}
+
+.fig{
+  background: #060a14;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .74rem;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre;
+  color: #93c5fd;
+  margin: 14px 0;
+}
+
+.quote{
+  border-left: 4px solid var(--purple);
+  background: rgba(167,139,250,.10);
+  padding: 12px 16px;
+  border-radius: 0 12px 12px 0;
+  margin: 14px 0;
+  font-size: .92rem;
+}
+html.light .quote{ background:#f5f3ff; }
+
+mark.search-hl{
+  background: #fde047;
+  color: #111827;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+/* ============================================================
+   ÍNDICE Y SECCIONES DE PROMPTS
+   ============================================================ */
+.prompt-index{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin: 14px 0 26px;
+}
+.prompt-index h3{
+  margin: 0 0 10px;
+  font-size: 1rem;
+  color: var(--blue);
+  border: 0;
+  padding: 0;
+}
+.prompt-index ul{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  columns: 2;
+  column-gap: 20px;
+}
+.prompt-index li{
+  margin: .35rem 0;
+  break-inside: avoid;
+  font-size: .9rem;
+}
+.prompt-index a{
+  color: var(--text);
+  text-decoration: none;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  transition: background .15s, color .15s;
+  min-height: 32px;
+}
+.prompt-index a::before{
+  content: "→";
+  color: var(--blue);
+  font-weight: 800;
+  flex: 0 0 auto;
+}
+.prompt-index a:hover,
+.prompt-index a:focus{
+  background: var(--accent);
+  color: #ffffff;
+  outline: none;
+}
+html.light .prompt-index a:hover,
+html.light .prompt-index a:focus{ color: #0b2545; }
+
+@media (max-width: 640px){
+  .prompt-index ul{ columns: 1; }
+}
+
+.prompt-section{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  margin: 22px 0;
+  scroll-margin-top: 90px;
+  box-shadow: var(--shadow);
+}
+.prompt-section > h2{
+  margin-top: 0;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: .5rem;
+}
+.prompt-section p{
+  font-size: .93rem;
+}
+.prompt-section p strong{ color: var(--blue); }
+
+.promptBox{
+  margin-top: 14px;
+}
+
+.promptActions{
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+  gap: 8px;
+}
+
+.promptBody{
+  margin: 0;
+  background: #060a14;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  overflow-x: auto;
+  font-size: .78rem;
+  line-height: 1.55;
+  color: #cbd5e1;
+  white-space: pre;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+html.light .promptBody{ background:#0f172a; color:#e2e8f0; }
+
+@media (max-width: 640px){
+  .prompt-section{ padding: 14px; }
+  .prompt-section > h2{ font-size: 1.1rem; }
+  .copyBtn{
+    min-height: 44px;
+    padding: 11px 18px;
+    font-size: .82rem;
+  }
+}
+
+/* ============================================================
+   AVISO DE IMPRESIÓN
+   ============================================================ */
+.print-notice{
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translate(-50%, 140%);
+  width: min(560px, calc(100% - 32px));
+  background: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid var(--warn);
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: .85rem;
+  z-index: 90;
+  box-shadow: 0 12px 40px rgba(0,0,0,.5);
+  transition: transform .35s ease;
+  line-height: 1.5;
+}
+.print-notice.show{ transform: translate(-50%, 0); }
+.print-notice kbd{
+  background:#0f172a; border:1px solid #475569; border-radius:5px;
+  padding:1px 5px; font-size:.8em;
+}
+.print-notice .copyBtn{ margin-top: 10px; }
+
+/* ============================================================
+   VOLVER ARRIBA
+   ============================================================ */
+.to-top{
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--accent);
+  color: #dbeafe;
+  font-size: 1.15rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity .25s, transform .25s;
+  z-index: 60;
+  box-shadow: var(--shadow);
+}
+.to-top.show{ opacity: 1; pointer-events: auto; transform: none; }
+html.light .to-top{ color:#0b2545; }
+
+/* ============================================================
+   CRÉDITOS
+   ============================================================ */
+.credit-name{
+  font-size: clamp(2rem, 8vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  line-height: 1.05;
+  margin: .3rem 0 .1rem;
+  background: linear-gradient(90deg, #38bdf8, #a78bfa, #38bdf8);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine 6s linear infinite;
+}
+@keyframes shine{ to{ background-position: 200% center; } }
+.credit-role{
+  font-size: 1rem;
+  color: var(--muted);
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 0 0 6px;
+}
+.stamp{
+  display:inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: var(--accent);
+  border: 1px solid #2b4f7a;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: .88rem;
+  color: #dbeafe;
+  margin: 6px 8px 6px 0;
+}
+html.light .stamp{ color:#0b2545; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 640px){
+  h1{ font-size: 1.5rem; }
+  h2{ font-size: 1.18rem; }
+  .tabs{ padding: 8px 12px; gap: 5px; }
+  .tab{ padding: 6px 11px; font-size: .72rem; }
+  main{ padding: 16px 12px 90px; }
+  .toolbar{ padding: 14px 12px 4px; }
+  #searchInput{ width: 140px; }
+  .card{ padding: 15px; }
+  table{ font-size: .78rem; }
+  th, td{ padding: 8px 9px; }
+}
+
+/* ============================================================
+   IMPRESIÓN / PDF
+   ============================================================ */
+@media print{
+  @page{ size: A4 portrait; margin: 14mm 12mm; }
+
+  html, body{
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 11pt !important;
+  }
+
+  .toolbar, .tabs, .to-top, .copyBtn, .progress-bar, nav, .print-notice{
+    display: none !important;
+  }
+  .search-hl{
+    background: transparent !important;
+    color: #000000 !important;
+    padding: 0 !important;
+  }
+
+  .panel{
+    display: block !important;
+    page-break-after: auto !important;
+    animation: none !important;
+  }
+
+  pre, table{
+    overflow: visible !important;
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+  }
+
+  *{
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .card, .box, .mini, details, table, th, td, .fig, .quote,
+  .prompt-section, .prompt-index, .promptBox{
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #999999 !important;
+  }
+  thead{ background: #dddddd !important; }
+  th{ background: #dddddd !important; color: #000000 !important; }
+  h1, h2, h3, h4, p, li, span, b, strong, small{ color: #000000 !important; }
+  a{ color: #000000 !important; text-decoration: underline; }
+
+  .tag, .stamp, .num, .mini .num{
+    background: #eeeeee !important;
+    color: #000000 !important;
+    border: 1px solid #999999 !important;
+  }
+  .credit-name{
+    background: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    color: #000000 !important;
+    animation: none !important;
+    font-size: 26pt !important;
+  }
+  .steps li::before{
+    background: #dddddd !important;
+    color: #000000 !important;
+    border: 1px solid #666666 !important;
+  }
+  pre, code, .promptBody{
+    background: #f4f4f4 !important;
+    color: #000000 !important;
+    border: 1px solid #999999 !important;
+  }
+
+  .hero-svg-mount{
+    background: #ffffff !important;
+    border: 1px solid #999999 !important;
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+  .hero-svg-mount svg{ max-height: 68mm; }
+
+  details{ page-break-inside: avoid; }
+  h2, h3{ page-break-after: avoid; }
+
+  .prompt-index a{ color: #000000 !important; }
+  .prompt-index a::before{ color: #000000 !important; }
+  .prompt-section{ page-break-inside: avoid; }
+  .prompt-section > h2{ color: #000000 !important; }
+  .prompt-section p strong{ color: #000000 !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SVG FUENTE (oculto). Única definición del dibujo.
+     ============================================================ -->
+<svg id="svgHeroSource" width="0" height="0" aria-hidden="true" focusable="false"
+     style="position:absolute;width:0;height:0;overflow:hidden;left:-9999px;top:0">
+  <defs>
+    <linearGradient id="gBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="0.55" stop-color="#132043"/>
+      <stop offset="1" stop-color="#1e3a5f"/>
+    </linearGradient>
+    <linearGradient id="gAcc" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#a78bfa"/>
+    </linearGradient>
+    <filter id="fGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blurOut"/>
+      <feMerge>
+        <feMergeNode in="blurOut"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g id="svgHero">
+    <rect x="0" y="0" width="820" height="260" rx="18" fill="url(#gBg)"/>
+    <rect x="0.5" y="0.5" width="819" height="259" rx="18" fill="none" stroke="#1e3a5f"/>
+
+    <g opacity="0.09" stroke="#38bdf8" stroke-width="1">
+      <path d="M0 52 H820 M0 130 H820 M0 208 H820"/>
+      <path d="M164 0 V260 M328 0 V260 M492 0 V260 M656 0 V260"/>
+    </g>
+
+    <g>
+      <animate attributeName="opacity" values="1;1;0.45;1" keyTimes="0;0.55;0.78;1"
+               dur="4.5s" begin="0s" repeatCount="indefinite"/>
+      <rect x="24" y="30" width="150" height="40" rx="10" fill="#0f172a" stroke="#1e3a5f"/>
+      <circle cx="48" cy="50" r="11" fill="url(#gAcc)" opacity="0.9"/>
+      <circle cx="48" cy="46" r="3.8" fill="#0a0e1a"/>
+      <path d="M41 57 a7 7 0 0 1 14 0 z" fill="#0a0e1a"/>
+      <text x="68" y="54.5" font-size="13" font-weight="700" fill="#cbd5e1"
+            font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+            letter-spacing="0.6">PERSONAJE</text>
+    </g>
+
+    <g>
+      <animate attributeName="opacity" values="1;1;0.45;1" keyTimes="0;0.55;0.78;1"
+               dur="4.5s" begin="1.1s" repeatCount="indefinite"/>
+      <rect x="24" y="82" width="150" height="40" rx="10" fill="#0f172a" stroke="#1e3a5f"/>
+      <circle cx="48" cy="102" r="11" fill="url(#gAcc)" opacity="0.9"/>
+      <path d="M42 104 v-3 a6 6 0 0 1 12 0 v3" stroke="#0a0e1a" stroke-width="2.4" fill="none"/>
+      <rect x="40" y="103" width="4" height="7" rx="2" fill="#0a0e1a"/>
+      <rect x="52" y="103" width="4" height="7" rx="2" fill="#0a0e1a"/>
+      <text x="68" y="106.5" font-size="13" font-weight="700" fill="#cbd5e1"
+            font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+            letter-spacing="0.6">PRODUCTO</text>
+    </g>
+
+    <g>
+      <animate attributeName="opacity" values="1;1;0.45;1" keyTimes="0;0.55;0.78;1"
+               dur="4.5s" begin="2.2s" repeatCount="indefinite"/>
+      <rect x="24" y="134" width="150" height="40" rx="10" fill="#0f172a" stroke="#1e3a5f"/>
+      <circle cx="48" cy="154" r="11" fill="url(#gAcc)" opacity="0.9"/>
+      <path d="M40 159 v-8 l8-6 8 6 v8 z" fill="#0a0e1a"/>
+      <text x="68" y="158.5" font-size="13" font-weight="700" fill="#cbd5e1"
+            font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+            letter-spacing="0.6">LOCACIÓN</text>
+    </g>
+
+    <g>
+      <animate attributeName="opacity" values="1;1;0.45;1" keyTimes="0;0.55;0.78;1"
+               dur="4.5s" begin="3.3s" repeatCount="indefinite"/>
+      <rect x="24" y="186" width="150" height="40" rx="10" fill="#0f172a" stroke="#1e3a5f"/>
+      <circle cx="48" cy="206" r="11" fill="url(#gAcc)" opacity="0.9"/>
+      <rect x="41" y="198" width="6" height="7" rx="1" fill="#0a0e1a"/>
+      <rect x="49" y="198" width="6" height="7" rx="1" fill="#0a0e1a"/>
+      <rect x="41" y="207" width="6" height="7" rx="1" fill="#0a0e1a"/>
+      <rect x="49" y="207" width="6" height="7" rx="1" fill="#0a0e1a"/>
+      <text x="68" y="210.5" font-size="13" font-weight="700" fill="#cbd5e1"
+            font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+            letter-spacing="0.6">STORYBOARD</text>
+    </g>
+
+    <g fill="none" stroke="url(#gAcc)" stroke-width="1.6" stroke-dasharray="6 6" opacity="0.55">
+      <path d="M176 50 C 236 50, 236 110, 296 110">
+        <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1.4s" repeatCount="indefinite"/>
+      </path>
+      <path d="M176 102 C 236 102, 244 124, 296 124">
+        <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1.4s" begin="0.2s" repeatCount="indefinite"/>
+      </path>
+      <path d="M176 154 C 236 154, 244 138, 296 138">
+        <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1.4s" begin="0.4s" repeatCount="indefinite"/>
+      </path>
+      <path d="M176 206 C 236 206, 236 152, 296 152">
+        <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1.4s" begin="0.6s" repeatCount="indefinite"/>
+      </path>
+    </g>
+
+    <circle cx="376" cy="132" r="46" fill="none" stroke="#38bdf8" stroke-width="1.5" opacity="0.4">
+      <animate attributeName="r" values="46;66;46" dur="3.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.45;0;0.45" dur="3.6s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="296" y="96" width="160" height="72" rx="16" fill="#0f172a"
+          stroke="url(#gAcc)" stroke-width="1.6" filter="url(#fGlow)"/>
+    <text x="376" y="126" text-anchor="middle" font-size="15" font-weight="800" fill="#e2e8f0"
+          font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif">GOOGLE FLOW</text>
+    <text x="376" y="147" text-anchor="middle" font-size="11" letter-spacing="2.5" fill="#38bdf8"
+          font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif">AGENT MODE</text>
+
+    <path d="M456 132 H476" stroke="url(#gAcc)" stroke-width="2" stroke-dasharray="4 4" fill="none">
+      <animate attributeName="stroke-dashoffset" from="0" to="-16" dur="0.8s" repeatCount="indefinite"/>
+    </path>
+
+    <rect x="476" y="56" width="324" height="148" rx="12" fill="#0b1220" stroke="#1e3a5f"/>
+    <line x1="490" y1="68" x2="784" y2="68" stroke="#1e3a5f" stroke-width="6" stroke-dasharray="8 12"/>
+    <line x1="490" y1="192" x2="784" y2="192" stroke="#1e3a5f" stroke-width="6" stroke-dasharray="8 12"/>
+
+    <g>
+      <animate attributeName="opacity" values="1;1;0.45;1" keyTimes="0;0.55;0.78;1"
+               dur="4.5s" begin="0s" repeatCount="indefinite"/>
+      <rect x="490" y="80" width="90" height="88" rx="6" fill="#0f172a" stroke="#1e3a5f"/>
+      <circle cx="556" cy="102" r="9" fill="#38bdf8" opacity="0.55"/>
+      <path d="M498 152 v-26 h9 v26 z M509 152 v-38 h11 v38 z M522 152 v-20 h9 v20 z M533 152 v-32 h11 v32 z M546 152 v-24 h9 v24 z M557 152 v-30 h10 v30 z"
+            fill="#1e3a5f"/>
+      <rect x="496" y="152" width="78" height="3" rx="1.5" fill="#334155"/>
+      <circle cx="518" cy="128" r="4.5" fill="#a78bfa"/>
+      <path d="M512.5 152 v-14 a5.5 5.5 0 0 1 11 0 v14 z" fill="#a78bfa"/>
+    </g>
+
+    <g>
+      <animate attributeName="opacity" values="1;1;0.45;1" keyTimes="0;0.55;0.78;1"
+               dur="4.5s" begin="1.5s" repeatCount="indefinite"/>
+      <rect x="592" y="80" width="90" height="88" rx="6" fill="#0f172a" stroke="#1e3a5f"/>
+      <path d="M622 124 v-6 a15 15 0 0 1 30 0 v6" stroke="#38bdf8" stroke-width="5"
+            fill="none" stroke-linecap="round"/>
+      <rect x="614" y="120" width="10" height="20" rx="5" fill="#38bdf8"/>
+      <rect x="650" y="120" width="10" height="20" rx="5" fill="#38bdf8"/>
+      <path d="M670 112 a20 20 0 0 1 0 30" stroke="#a78bfa" stroke-width="2" fill="none" opacity="0.8">
+        <animate attributeName="opacity" values="0.2;0.9;0.2" dur="2.2s" repeatCount="indefinite"/>
+      </path>
+      <rect x="598" y="146" width="78" height="14" rx="7" fill="#1e3a5f"/>
+      <rect x="606" y="151.5" width="40" height="3" rx="1.5" fill="#38bdf8" opacity="0.7"/>
+    </g>
+
+    <g>
+      <animate attributeName="opacity" values="1;1;0.45;1" keyTimes="0;0.55;0.78;1"
+               dur="4.5s" begin="3s" repeatCount="indefinite"/>
+      <rect x="694" y="80" width="90" height="88" rx="6" fill="#0f172a" stroke="#1e3a5f"/>
+      <circle cx="739" cy="118" r="20" fill="none" stroke="#38bdf8" stroke-width="2"/>
+      <path d="M733 108 l16 10 -16 10 z" fill="#38bdf8"/>
+      <rect x="700" y="146" width="78" height="14" rx="7" fill="#1e3a5f"/>
+      <rect x="722" y="151.5" width="34" height="3" rx="1.5" fill="#a78bfa" opacity="0.8"/>
+    </g>
+
+    <rect x="490" y="80" width="2.5" height="88" fill="#38bdf8" opacity="0.7">
+      <animate attributeName="x" values="490;782;490" dur="6s" repeatCount="indefinite"/>
+    </rect>
+
+    <text x="410" y="250" text-anchor="middle" font-size="11" letter-spacing="1.4" fill="#64748b"
+          font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+      4 ACTIVOS INDEPENDIENTES → 1 PLAN DE PRODUCCIÓN → VIDEO COHERENTE
+    </text>
+  </g>
+</svg>
+
+<!-- ============================================================
+     BARRA DE PROGRESO
+     ============================================================ -->
+<div class="progress-bar"><div id="progressFill"></div></div>
+
+<!-- ============================================================
+     TOOLBAR
+     ============================================================ -->
+<header class="toolbar">
+  <div class="brand"><span class="dot"></span> Publicidad Cinematográfica con IA</div>
+
+  <div class="tool-group">
+    <div class="search-wrap">
+      <input id="searchInput" type="search" placeholder="Buscar en el tutorial…" aria-label="Buscar en el tutorial">
+    </div>
+    <span id="searchInfo" aria-live="polite"></span>
+  </div>
+
+  <div class="tool-group">
+    <button class="tbtn" id="btnMinus" type="button" title="Reducir tamaño de texto">A−</button>
+    <button class="tbtn" id="btnPlus" type="button" title="Aumentar tamaño de texto">A+</button>
+    <button class="tbtn" id="btnTheme" type="button" title="Cambiar modo claro / oscuro">☀︎ Claro</button>
+    <button class="tbtn" id="btnPrint" type="button" title="Imprimir o guardar como PDF">🖨 Imprimir / PDF</button>
+  </div>
+</header>
+
+<!-- ============================================================
+     PESTAÑAS
+     ============================================================ -->
+<nav class="tabs" role="tablist" aria-label="Secciones del tutorial">
+  <button class="tab active" role="tab" data-target="p-inicio" aria-selected="true" aria-controls="p-inicio" type="button">INICIO</button>
+  <button class="tab" role="tab" data-target="p-conceptos" aria-selected="false" aria-controls="p-conceptos" type="button">CONCEPTOS</button>
+  <button class="tab" role="tab" data-target="p-procedimiento" aria-selected="false" aria-controls="p-procedimiento" type="button">PROCEDIMIENTO</button>
+  <button class="tab" role="tab" data-target="p-practica" aria-selected="false" aria-controls="p-practica" type="button">PRÁCTICA</button>
+  <button class="tab" role="tab" data-target="p-errores" aria-selected="false" aria-controls="p-errores" type="button">ERRORES</button>
+  <button class="tab" role="tab" data-target="p-prompts" aria-selected="false" aria-controls="p-prompts" type="button">PROMPTS</button>
+  <button class="tab" role="tab" data-target="p-resumen" aria-selected="false" aria-controls="p-resumen" type="button">RESUMEN</button>
+  <button class="tab" role="tab" data-target="p-fuentes" aria-selected="false" aria-controls="p-fuentes" type="button">FUENTES</button>
+  <button class="tab" role="tab" data-target="p-creditos" aria-selected="false" aria-controls="p-creditos" type="button">CRÉDITOS</button>
+</nav>
+
+<main>
+
+<!-- ============================================================
+     PANEL: INICIO
+     ============================================================ -->
+<section class="panel active" id="p-inicio" role="tabpanel" aria-label="Inicio">
+
+  <div class="hero-svg-mount" data-svg-hero="true" role="img"
+       aria-label="Esquema animado: cuatro activos visuales independientes (personaje, producto, locación y storyboard) alimentan a Google Flow Agent Mode, que produce la secuencia de un comercial cinematográfico."></div>
+  <p class="hero-caption">Cuatro activos independientes entran. Un comercial coherente sale.</p>
+
+  <h1>Publicidad Cinematográfica con IA:<br>de ChatGPT a Google Flow Agent Mode</h1>
+  <p class="lead">Guía completa para crear anuncios publicitarios de calidad cinematográfica <strong>sin cámara, sin actores y sin set</strong>, manteniendo el mismo personaje, el mismo producto y el mismo escenario en todas las tomas.</p>
+
+  <div class="card">
+    <h2 style="margin-top:0;border:0;padding:0;">¿Qué vas a aprender?</h2>
+    <p>Vas a aprender un <strong>sistema de trabajo ordenado en fases</strong> que usa dos herramientas de Inteligencia Artificial:</p>
+    <ul>
+      <li><strong>ChatGPT</strong> actúa como Director Creativo, Guionista y Diseñador de Prompts (toda la preproducción).</li>
+      <li><strong>Google Flow Agent Mode</strong> actúa como motor de generación y producción autónoma de video.</li>
+    </ul>
+    <p>Al terminar sabrás convertir una idea suelta en un <strong>spot publicitario completo</strong>, con personaje fijo, producto fiel al original, escenario coherente, guión, storyboard y montaje final.</p>
+  </div>
+
+  <h2>¿Para qué sirve este método?</h2>
+  <p>Sirve para producir <strong>spots comerciales completos</strong> sin grabar con cámaras reales, sin contratar actores físicos y sin diseñar escenarios complejos.</p>
+  <p>Con este sistema se garantiza que <strong>el personaje, el producto y el escenario se mantengan idénticos en todas las tomas</strong> del anuncio.</p>
+
+  <h2>¿Por qué es crucial aprenderlo?</h2>
+  <div class="box warn">
+    <p style="margin:0;"><strong>El mayor problema al generar videos con IA es la inconsistencia visual.</strong></p>
+  </div>
+  <p>Cuando intentas generar varias escenas para un mismo comercial de la forma "normal", la IA cambia la cara del actor, altera el diseño del producto o modifica el fondo en cada toma. El resultado se ve amateur y rompe la historia.</p>
+  <p>Este método resuelve ese problema <strong>dividiendo el trabajo en fases estrictas</strong>. Al "bloquear" los activos visuales clave <em>antes</em> de generar el video, obligas a la IA a respetar la continuidad narrativa y estética.</p>
+
+  <h2>¿Qué necesitas antes de empezar?</h2>
+  <table>
+    <thead>
+      <tr><th>Herramienta</th><th>Rol en la producción</th><th>Requisitos / Costo</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>ChatGPT</strong></td>
+        <td>Director Creativo, Guionista y Diseñador de Prompts</td>
+        <td>Cuenta gratuita o Plus (soporta análisis de imágenes)</td>
+      </tr>
+      <tr>
+        <td><strong>Google Flow (Agent Mode)</strong></td>
+        <td>Motor de generación autónoma de video en IA</td>
+        <td>Herramienta de IA con acceso a <em>Agent Mode</em></td>
+      </tr>
+      <tr>
+        <td><strong>CapCut / Editor de video</strong></td>
+        <td>Montaje, corrección de ritmo, audio y exportación</td>
+        <td>Gratuito (PC o móvil)</td>
+      </tr>
+      <tr>
+        <td><strong>Imágenes de referencia</strong></td>
+        <td>Fotos del personaje y del producto desde varios ángulos</td>
+        <td>Archivos PNG o JPG de buena calidad</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Objetivos del tutorial</h2>
+  <div class="grid">
+    <div class="mini">
+      <div class="num">1</div>
+      <h4>Entender el problema</h4>
+      <p>Saber por qué la IA "olvida" cómo era tu personaje entre una toma y la siguiente.</p>
+    </div>
+    <div class="mini">
+      <div class="num">2</div>
+      <h4>Dominar los 4 activos</h4>
+      <p>Construir Ficha de Personaje, de Producto, de Locación y Storyboard por separado.</p>
+    </div>
+    <div class="mini">
+      <div class="num">3</div>
+      <h4>Guión y storyboard</h4>
+      <p>Pasar de una idea a una tabla técnica de tomas lista para producir.</p>
+    </div>
+    <div class="mini">
+      <div class="num">4</div>
+      <h4>Producir en Flow</h4>
+      <p>Configurar Agent Mode y obtener la secuencia completa del comercial.</p>
+    </div>
+    <div class="mini">
+      <div class="num">5</div>
+      <h4>Corregir errores</h4>
+      <p>Diagnosticar fallos concretos y arreglarlos sin reiniciar todo el proyecto.</p>
+    </div>
+    <div class="mini">
+      <div class="num">6</div>
+      <h4>Montar y exportar</h4>
+      <p>Editar ritmo, audio y música en CapCut y exportar el spot final.</p>
+    </div>
+  </div>
+
+  <h2>Cómo utilizar este tutorial</h2>
+  <ol class="steps">
+    <li><b>Lee la pestaña CONCEPTOS primero.</b> Entenderás el "por qué" antes del "cómo".</li>
+    <li><b>Sigue la pestaña PROCEDIMIENTO en orden.</b> Las etapas están numeradas del 1 al 11 y no deben saltarse.</li>
+    <li><b>Ten la pestaña PROMPTS abierta en paralelo.</b> Ahí están los textos exactos que debes copiar y pegar.</li>
+    <li><b>Haz la pestaña PRÁCTICA.</b> Marca la lista de comprobación: tu progreso se guarda en este navegador.</li>
+    <li><b>Consulta ERRORES cuando algo falle.</b> No reinicies todo: busca el síntoma en la tabla de diagnóstico.</li>
+  </ol>
+
+  <h2>Mapa del flujo completo</h2>
+  <div class="fig">BLOQUE 1 — PREPRODUCCIÓN (ChatGPT)
+  Etapa 1  →  Ficha de Personaje      (Character Lock)
+  Etapa 2  →  Ficha de Producto       (Product Lock)
+  Etapa 3  →  Ficha de Locación       (Location Lock)
+  Etapa 4  →  10 conceptos publicitarios
+  Etapa 5  →  Tú eliges 1 concepto
+  Etapa 6  →  Tú eliges la duración
+  Etapa 7  →  Guión publicitario
+  Etapa 8  →  Tabla de storyboard técnico
+  Etapa 9  →  Imagen de Storyboard Completo
+  Etapa 10 →  Control de calidad de los 4 activos
+
+BLOQUE 2 — PRODUCCIÓN (Google Flow Agent Mode)
+  Etapa 11 →  Master Prompt Final + 4 imágenes  →  video
+
+BLOQUE 3 — POSTPRODUCCIÓN (CapCut / editor)
+  Montaje · Ritmo · Audio · Exportación</div>
+
+  <div class="box ok">
+    <p style="margin:0;"><strong>Consejo de arranque:</strong> no abras Google Flow hasta tener los cuatro activos descargados y revisados. La mitad de los errores de este método vienen de saltarse ese control.</p>
+  </div>
+</section>
+
+<!-- ============================================================
+     PANEL: CONCEPTOS
+     ============================================================ -->
+<section class="panel" id="p-conceptos" role="tabpanel" aria-label="Conceptos">
+
+  <h1>Conceptos fundamentales</h1>
+  <p class="lead">Antes de tocar ninguna herramienta, necesitas entender una única idea: <strong>separar para no contaminar</strong>.</p>
+
+  <h2>¿Qué es esta metodología?</h2>
+  <p>Es un <strong>sistema de trabajo estructurado y secuencial</strong> para crear anuncios publicitarios en video de calidad cinematográfica utilizando Inteligencia Artificial.</p>
+  <p>Combina el poder de <strong>ChatGPT</strong> (como director creativo y guionista de preproducción) con <strong>Google Flow Agent Mode</strong> (como motor de generación y producción de video autónomo).</p>
+
+  <h2>El problema: la inconsistencia visual</h2>
+  <div class="box bad">
+    <p style="margin:0;">El mayor problema al generar videos con IA es que <strong>la IA cambia la cara del actor, altera el diseño del producto o modifica el fondo</strong> en cada toma.</p>
+  </div>
+  <p>Esto ocurre porque el motor de video no tiene memoria visual fiable entre generaciones. Si le das referencias mezcladas o ambiguas, "rellena" los huecos inventando. Y lo que inventa no coincide con la toma anterior.</p>
+
+  <h2>La solución: separación absoluta de activos</h2>
+  <p>La regla más importante de todo el sistema es la <strong>separación estricta de etapas</strong>. La Inteligencia Artificial tiende a mezclarse y confundirse si le pides muchas cosas a la vez.</p>
+  <p>Por eso: <strong>nunca debes generar un activo visual de una etapa futura en una etapa temprana.</strong></p>
+
+  <h3>El Principio de Protección contra Etapas Futuras (<em>Future-Stage Protection</em>)</h3>
+  <p>Significa que cada elemento visual se construye <em>solo</em> cuando le toca, en su propia imagen, sin adelantarse ni mezclarse con otros.</p>
+
+  <h2>Los 4 activos visuales sagrados e independientes</h2>
+  <p>Para que la IA de video no cometa errores, debes construir exactamente <strong>cuatro archivos de imagen independientes</strong>:</p>
+
+  <div class="grid">
+    <div class="mini">
+      <div class="num">1</div>
+      <h4>Ficha de Personaje</h4>
+      <p>Hoja con el personaje desde varios ángulos. Sin producto, sin locación, sin storyboard.</p>
+    </div>
+    <div class="mini">
+      <div class="num">2</div>
+      <h4>Ficha de Producto</h4>
+      <p>Hoja con el producto y sus detalles. Sin personaje sosteniéndolo.</p>
+    </div>
+    <div class="mini">
+      <div class="num">3</div>
+      <h4>Ficha de Locación</h4>
+      <p>Hoja del escenario o entorno visual. Sin personas y sin viñetas de historia.</p>
+    </div>
+    <div class="mini">
+      <div class="num">4</div>
+      <h4>Storyboard Completo</h4>
+      <p>Hoja con la secuencia de escenas ordenadas. Es el último activo que se genera.</p>
+    </div>
+  </div>
+
+  <h2>Comparativa: prácticas correctas vs. incorrectas</h2>
+  <table>
+    <thead>
+      <tr><th>Aspecto</th><th>✔ Práctica correcta</th><th>✘ Práctica incorrecta</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Ficha de Locación</strong></td>
+        <td>Mostrar únicamente el ambiente, luces y arquitectura.</td>
+        <td>Dibujar al personaje dentro de la locación o incluir viñetas de historia.</td>
+      </tr>
+      <tr>
+        <td><strong>Ficha de Producto</strong></td>
+        <td>Mostrar el producto desde varios ángulos (frente, perfil, detalle).</td>
+        <td>Poner al personaje sosteniendo el producto en esta etapa.</td>
+      </tr>
+      <tr>
+        <td><strong>Storyboard</strong></td>
+        <td>Una cuadrícula con la secuencia de imágenes del anuncio.</td>
+        <td>Unir la ficha del producto y la locación dentro de la misma imagen del storyboard.</td>
+      </tr>
+      <tr>
+        <td><strong>Generación</strong></td>
+        <td>Subir los 4 archivos de imagen por separado a Google Flow.</td>
+        <td>Subir una sola imagen combinada o "colada".</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>La analogía del cineasta: el director metódico vs. el caos visual</h2>
+  <div class="quote">
+    <p><strong>Imagine que usted es el director de una película de Hollywood.</strong></p>
+    <p><strong>El enfoque caótico (sin este método):</strong> llama a un actor diferente cada mañana, le da una botella de gaseosa con una etiqueta distinta en cada escena y graba en un restaurante nuevo cada dos horas. El resultado es un desastre donde nadie entiende la historia.</p>
+    <p><strong>El enfoque metódico (este método):</strong> primero hace un <em>casting</em> y fotografía al actor fijo (Ficha de Personaje). Luego diseña la botella exacta de la marca (Ficha de Producto). Después selecciona el set de grabación (Ficha de Locación). Finalmente dibuja cada plano (Storyboard) y recién ahí enciende las cámaras.</p>
+  </div>
+
+  <h2>Caso práctico cotidiano</h2>
+  <div class="box">
+    <p><strong>Caso:</strong> imagine que promociona unos auriculares Sony.</p>
+    <p><strong>Error común:</strong> en la Ficha de Locación, genera una foto de una chica escuchando música en una oficina. La IA asume que esa foto ya es el anuncio final y, cuando intenta hacer el video, copia la postura congelada en lugar del ambiente.</p>
+    <p><strong>Solución correcta:</strong> la Ficha de Locación muestra solo la oficina vacía con su iluminación. La Ficha de Personaje muestra a la chica en fondo neutro. La Ficha de Producto muestra solo los auriculares Sony. De este modo, Google Flow sabe exactamente qué es cada elemento.</p>
+  </div>
+
+  <h2>Glosario de términos técnicos</h2>
+  <table>
+    <thead><tr><th>Término</th><th>Significado</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Agent Mode</strong></td><td>Modo de trabajo autónomo en Google Flow que ejecuta un plan de producción completo interpretando texto e imágenes.</td></tr>
+      <tr><td><strong>Character Lock / Product Lock / Location Lock</strong></td><td>Proceso de congelar la apariencia de un personaje, producto o escenario para que la IA no los modifique en tomas posteriores.</td></tr>
+      <tr><td><strong>Future-Stage Protection</strong></td><td>Regla estricta que prohíbe generar activos visuales de etapas futuras antes de tiempo.</td></tr>
+      <tr><td><strong>Reuse Prompt</strong></td><td>Herramienta de Google Flow para regenerar una toma específica utilizando el contexto previo.</td></tr>
+      <tr><td><strong>Master Prompt</strong></td><td>Instrucción marco extensa que programa el comportamiento, rol y límites de la IA.</td></tr>
+      <tr><td><strong>Hook (Gancho)</strong></td><td>Los primeros 3 segundos del anuncio, diseñados para captar la atención inmediata del espectador.</td></tr>
+      <tr><td><strong>Storyboard</strong></td><td>Secuencia gráfica de ilustraciones que muestran el plan visual de cada toma de un comercial.</td></tr>
+      <tr><td><strong>B-Roll</strong></td><td>Tomas de apoyo secundario que muestran detalles del producto o del ambiente.</td></tr>
+      <tr><td><strong>Pacing (Ritmo)</strong></td><td>La velocidad y fluidez con la que se suceden los cortes de escena en el montaje.</td></tr>
+      <tr><td><strong>Trimming (Recorte)</strong></td><td>Acción de cortar los extremos sobrantes o defectuosos de un clip en postproducción.</td></tr>
+      <tr><td><strong>Call to Action (CTA)</strong></td><td>La frase o invitación final del anuncio ("Compra ahora", "Menos distracción, más tú").</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Resumen de CONCEPTOS</h2>
+  <ul>
+    <li>La producción con IA tradicional falla por falta de consistencia visual.</li>
+    <li>El método ChatGPT + Google Flow Agent Mode resuelve la inconsistencia mediante un flujo secuencial estricto.</li>
+    <li>Se basa en planificar completamente la preproducción antes de generar un solo segundo de video.</li>
+    <li>Los cuatro activos visuales principales deben ser imágenes totalmente independientes.</li>
+    <li>Mezclar un activo con otro arruinará la generación en Google Flow.</li>
+  </ul>
+</section>
+
+<!-- ============================================================
+     PANEL: PROCEDIMIENTO
+     ============================================================ -->
+<section class="panel" id="p-procedimiento" role="tabpanel" aria-label="Procedimiento">
+
+  <h1>Procedimiento paso a paso</h1>
+  <p class="lead">Once etapas, en orden estricto. Cada paso es <strong>una sola acción</strong>.</p>
+
+  <div class="box warn">
+    <p style="margin:0;"><strong>Antes de empezar:</strong> asegúrate de tener a mano fotos nítidas de tu personaje y varias fotos reales de tu producto desde distintos ángulos. Sin ellas, el método no funciona.</p>
+  </div>
+
+  <h2>Etapa 1 — Admisión y bloqueo de personaje (<em>Character Lock</em>)</h2>
+  <h3>Objetivo</h3>
+  <p>Establecer la identidad visual de la persona o modelo que aparecerá en el comercial.</p>
+  <h3>Explicación sencilla</h3>
+  <p>La IA analiza la estructura facial, el tono de piel, los ojos, el cabello y la vestimenta para <strong>congelar estos rasgos</strong>. A partir de ahí, ese personaje no cambia en ninguna toma.</p>
+
+  <h3>Pasos</h3>
+  <ol class="steps">
+    <li>Abra <strong>ChatGPT</strong> en su navegador web.</li>
+    <li>Copie el <strong>Master Prompt Principal de Director Creativo</strong> (está completo en la pestaña PROMPTS) y péguelo en el chat.</li>
+    <li>Envíe el mensaje. ChatGPT asumirá el rol de Director Creativo Publicitario y comenzará el flujo secuencial.</li>
+    <li>ChatGPT le preguntará de forma estricta: <code>"Do you already have a character image you want to use?"</code></li>
+    <li>Responda seleccionando la Opción 1: <code>YES — I will provide the character image.</code></li>
+    <li>Suba una foto clara y de buena calidad de la persona que será el actor o actriz del anuncio.</li>
+    <li>Espere el análisis automático: ChatGPT estudiará rostro, peinado, ropa y contextura.</li>
+    <li>Revise la <strong>Ficha de Personaje (Character Sheet)</strong> que ChatGPT ha redactado.</li>
+    <li>Descargue la <strong>Imagen de Referencia de Personaje</strong> (varios ángulos de la misma persona).</li>
+    <li>Escriba la palabra de control <code>next</code> y envíela para pasar a la siguiente etapa.</li>
+  </ol>
+
+  <h3>Resultado esperado</h3>
+  <p>Un archivo PNG/JPG con la hoja de personaje: cara, perfil, expresión, cuerpo completo, ropa y proporciones. <strong>Sin producto, sin locación y sin viñetas de storyboard.</strong></p>
+
+  <div class="box">
+    <p style="margin:0;"><strong>Consejo de experto — selección de personaje:</strong> utilice fotografías con iluminación frontal y rostro despejado. Evite fotos con anteojos oscuros, sombras pesadas o filtros exagerados para garantizar que el análisis facial sea exacto.</p>
+  </div>
+
+  <h3>Si algo sale mal</h3>
+  <ul>
+    <li>Si ChatGPT inventa un personaje en vez de esperar tu foto, responde: <code>"Do not create a character. Wait for my image."</code></li>
+    <li>Si la hoja generada no se parece a tu foto, cámbiala por una foto con mejor luz frontal y vuelve a cargarla.</li>
+  </ul>
+
+  <h2>Etapa 2 — Admisión y bloqueo de producto (<em>Product Lock</em>)</h2>
+  <h3>Objetivo</h3>
+  <p>Garantizar que el producto comercial (dimensiones, colores, logotipos, materiales y botones) no sufra alteraciones ni deformaciones en el video.</p>
+
+  <h3>Pasos</h3>
+  <ol class="steps">
+    <li>Espere la pregunta de control de ChatGPT: <code>"Do you already have a product image you want to use?"</code></li>
+    <li>Seleccione la Opción 1: <code>YES — I will provide the product image.</code></li>
+    <li>Busque o tome varias fotos del <strong>producto real</strong> desde diferentes ángulos: frente, perfil, trasera, superior y vistas de detalle.</li>
+    <li>Incluya al menos una foto donde se vea el <strong>logotipo</strong> con claridad.</li>
+    <li>Suba todas las fotos del producto a ChatGPT en un solo mensaje.</li>
+    <li>Espere el análisis del diseño industrial.</li>
+    <li>Revise la <strong>Ficha de Producto (Product Sheet)</strong> generada.</li>
+    <li>Descargue la <strong>Imagen de Referencia de Producto</strong>.</li>
+    <li>Escriba <code>next</code> para continuar.</li>
+  </ol>
+
+  <div class="box">
+    <p style="margin:0;"><strong>Caso real:</strong> en el curso de referencia se utilizaron las fotos oficiales de los auriculares inalámbricos <em>Sony WH-1000XM6</em> en color negro. Cuantas más vistas reales subas, más fiel será la ficha.</p>
+  </div>
+
+  <h3>Resultado esperado</h3>
+  <p>Una hoja con el producto aislado, en varios ángulos, con sus materiales, colores, botones y logotipos correctos. <strong>Sin ninguna persona sosteniéndolo.</strong></p>
+
+  <h3>Si algo sale mal</h3>
+  <ul>
+    <li>Si el producto aparece deformado o con el logo cambiado, sube más fotos de detalle y pide: <code>"Regenerate the Product Sheet using only the supplied real photos. Do not invent details."</code></li>
+  </ul>
+
+  <h2>Etapa 3 — Admisión y bloqueo de locación (<em>Location Lock</em>)</h2>
+  <h3>Objetivo</h3>
+  <p>Establecer el entorno, la arquitectura, el mobiliario y la paleta de colores donde transcurrirá el anuncio.</p>
+
+  <h3>Pasos</h3>
+  <ol class="steps">
+    <li>Espere la pregunta: <code>"Do you already have a location image you want to use?"</code></li>
+    <li>Para este tutorial elegiremos la Opción 2 (dejar que la IA diseñe el escenario ideal): <code>NO — Create the location yourself.</code></li>
+    <li>Deje que ChatGPT diseñe el escenario según el público objetivo y la categoría del producto.</li>
+    <li>Revise la <strong>Ficha de Locación (Location Sheet)</strong>.</li>
+    <li>Compruebe que <strong>no haya personas, ni producto, ni viñetas de storyboard</strong> dentro de la imagen.</li>
+    <li>Descargue la <strong>Imagen de Referencia de Locación</strong>.</li>
+  </ol>
+
+  <h3>Resultado esperado</h3>
+  <p>Una hoja del ambiente: arquitectura, luces, mobiliario y paleta de color. Vacía de personajes y de acción.</p>
+
+  <h3>Si algo sale mal</h3>
+  <div class="box bad">
+    <p style="margin:0;"><strong>Instrucción de emergencia:</strong> si la Ficha de Locación incluye escenas del storyboard o personas, <strong>NO reinicie todo el proceso</strong>. Pida a ChatGPT: <code>"Regenerate ONLY the Location Sheet without any storyboard panels"</code>.</p>
+  </div>
+
+  <h3>Esquema del flujo de admisión (Etapas 1 a 3)</h3>
+  <div class="fig">[Inicio] → Carga de Personaje → Análisis/Ficha → Character Lock
+                                   ↓
+                              Comando `next`
+                                   ↓
+          Carga de Producto  → Análisis/Ficha → Product Lock
+                                   ↓
+                              Comando `next`
+                                   ↓
+        Selección Locación  → Análisis/Ficha → Location Lock</div>
+
+  <h2>Etapas 4, 5 y 6 — Conceptos, selección y duración</h2>
+
+  <h3>Etapa 4: generación de 10 conceptos publicitarios</h3>
+  <p>ChatGPT generará automáticamente <strong>10 ideas publicitarias creativas</strong> basadas en los activos que acabas de bloquear. Cada concepto contiene:</p>
+  <ol>
+    <li><strong>Título de la campaña</strong></li>
+    <li><strong>Hook</strong> (gancho inicial de 3 segundos)</li>
+    <li><strong>Problema o deseo del cliente</strong></li>
+    <li><strong>Solución</strong> mediante el producto</li>
+    <li><strong>Recompensa</strong> emocional o visual</li>
+    <li><strong>Mensaje publicitario final</strong> (slogan / CTA)</li>
+    <li><strong>Estilo visual</strong> recomendado</li>
+  </ol>
+
+  <div class="box">
+    <p><strong>Plataformas de inspiración publicitaria.</strong> Si no está seguro de qué concepto elegir, puede revisar ejemplos reales de campañas cinematográficas en:</p>
+    <ul style="margin-bottom:0;">
+      <li><strong>AdForum</strong> — anuncios organizados por categorías.</li>
+      <li><strong>Ads of the World</strong> — campañas creativas globales.</li>
+      <li><strong>Vimeo</strong> — sección de anuncios y comerciales cinematográficos.</li>
+    </ul>
+  </div>
+
+  <h3>Etapa 5: selección del concepto</h3>
+  <ol class="steps">
+    <li>Lea los 10 conceptos con calma.</li>
+    <li>Elija el número del concepto que más le guste. En el curso de referencia se eligió la opción <em>"Find your focus"</em> (Encuentra tu enfoque).</li>
+    <li>Escriba el número o el nombre del concepto y envíelo.</li>
+  </ol>
+
+  <h3>Etapa 6: duración del anuncio</h3>
+  <ol class="steps">
+    <li>Espere la pregunta: <code>"What duration do you want?"</code></li>
+    <li>Elija entre las opciones: 15s, 30s, 45s, 50s o 60s.</li>
+    <li>Para comerciales completos de redes o YouTube, seleccione <strong>45 seconds</strong> o <strong>50 seconds</strong>.</li>
+  </ol>
+
+  <div class="box warn">
+    <p style="margin:0;"><strong>Nota importante:</strong> la duración elegida aquí condiciona cuánto texto podrá decir el personaje. Si más adelante el diálogo se corta, esta es la variable que subirás.</p>
+  </div>
+
+  <h2>Etapa 7 — Redacción del guión publicitario estructurado</h2>
+  <p>ChatGPT redactará un guión profesional ajustado <strong>exactamente</strong> a la duración seleccionada.</p>
+
+  <h3>Estructura narrativa obligatoria</h3>
+  <div class="fig">HOOK → PROBLEMA/DESEO → PRODUCTO → EXPERIENCIA → BENEFICIO → RECOMPENSA → MENSAJE DE MARCA</div>
+
+  <div class="box bad">
+    <p style="margin:0;"><strong>Regla absoluta sobre animales:</strong> si el comercial incluye animales, los animales <strong>NUNCA</strong> deben hablar idioma humano ni tener diálogos. Su comunicación debe ser exclusivamente mediante sonidos naturales (ladridos, maullidos), movimientos corporales o expresiones faciales.</p>
+  </div>
+
+  <h2>Etapa 8 — Plan de storyboard técnico (texto / tabla)</h2>
+  <p>ChatGPT dividirá el guión en una tabla con la lista completa de tomas (<em>shot list</em>). Para un anuncio de 45–60 segundos se estructuran entre <strong>8 y 12 tomas</strong>.</p>
+
+  <h3>Ejemplo de tabla de storyboard técnico</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Toma</th><th>Duración</th><th>Acción principal</th><th>Personaje</th>
+        <th>Producto</th><th>Locación</th><th>Cámara</th><th>Diálogo / VO</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Shot 1</strong></td><td>4s</td>
+        <td>El personaje camina frustrado entre el ruido de la ciudad.</td>
+        <td>Presente</td><td>No visible</td><td>Exterior urbano</td><td>Plano medio</td>
+        <td><em>"When everything demands your attention..."</em></td>
+      </tr>
+      <tr>
+        <td><strong>Shot 2</strong></td><td>5s</td>
+        <td>Se coloca los auriculares y presiona el botón.</td>
+        <td>Presente</td><td>En uso (detalle)</td><td>Exterior urbano</td><td>Primer plano</td>
+        <td><em>"...choose what deserves it."</em></td>
+      </tr>
+      <tr>
+        <td><strong>Shot 3</strong></td><td>6s</td>
+        <td>El ruido desaparece, el entorno se vuelve pacífico.</td>
+        <td>Presente</td><td>En uso</td><td>Interior moderno</td><td>Plano general</td>
+        <td><em>"Sony WH-1000XM6. Less distraction, more you."</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Etapa 9 — Creación de la imagen de storyboard completo</h2>
+  <ol class="steps">
+    <li>Revise y apruebe el plan técnico de la Etapa 8.</li>
+    <li>Escriba <code>next</code> en ChatGPT.</li>
+    <li>Espere a que la IA use la Ficha de Personaje, la Ficha de Producto y la Ficha de Locación bloqueadas para componer <strong>una sola imagen de Storyboard Completo</strong>.</li>
+    <li>Compruebe que la cuadrícula de viñetas sigue el orden de las tomas.</li>
+    <li><strong>Descargue inmediatamente</strong> esta imagen.</li>
+  </ol>
+
+  <div class="fig">Viñeta 1 (Shot 1)  →  Viñeta 2 (Shot 2)  →  Viñeta 3 (Shot 3)
+        ↓                     ↓                     ↓
+Viñeta 4 (Shot 4)  →  Viñeta 5 (Shot 5)  →  Viñeta Final (Marca)</div>
+
+  <h2>Etapa 10 — Control de calidad y verificación final de activos</h2>
+  <p>Antes de ir a Google Flow, realice esta lista de comprobación de 4 activos para garantizar que no existan errores de contaminación:</p>
+
+  <div class="box ok">
+    <ul style="margin:0;">
+      <li><strong>Activo 1:</strong> ¿Tengo el archivo JPG/PNG de la Ficha de Personaje totalmente limpio?</li>
+      <li><strong>Activo 2:</strong> ¿Tengo el archivo JPG/PNG de la Ficha de Producto con todos sus ángulos?</li>
+      <li><strong>Activo 3:</strong> ¿Tengo el archivo JPG/PNG de la Ficha de Locación (sin personajes ni texto)?</li>
+      <li><strong>Activo 4:</strong> ¿Tengo el archivo JPG/PNG de la Imagen de Storyboard Completo?</li>
+    </ul>
+  </div>
+
+  <div class="box bad">
+    <p style="margin:0;"><strong>Instrucción de emergencia:</strong> si algún activo está contaminado, pida a ChatGPT: <code>"Regenerate ONLY the [nombre del activo] without any [elemento contaminante]"</code>. No reinicie el proceso completo.</p>
+  </div>
+
+  <h2>Etapa 11 — Producción en Google Flow Agent Mode</h2>
+
+  <h3>¿Qué es Google Flow Agent Mode?</h3>
+  <p>Es un entorno de generación de video con Inteligencia Artificial que cuenta con un <strong>agente autónomo</strong>. A diferencia de los generadores tradicionales, donde debes escribir un prompt por cada toma, el Agent Mode puede leer un plan de producción completo (Master Prompt + 4 imágenes de referencia) y generar la secuencia del comercial de forma coherente.</p>
+
+  <h3>Pasos</h3>
+  <ol class="steps">
+    <li>Abra <strong>Google Flow</strong> y cree un nuevo proyecto (<em>New Project</em>).</li>
+    <li>Abra el menú desplegable de modo y seleccione <strong>Agent Mode</strong>.</li>
+    <li>Vuelva a ChatGPT y copie el <strong>Final Flow AI Agent Master Prompt</strong> que el sistema le entregará al finalizar la Etapa 10.</li>
+    <li>Pegue ese texto en la casilla principal de Google Flow.</li>
+    <li>Abra el panel de ajustes (<em>Settings</em>) y configure exactamente estos valores:
+      <div class="fig" style="margin-top:10px;">Confirm before generating : NEVER   (evita pausas entre tomas)
+Aspect Ratio              : 16:9 (horizontal) o 9:16 (vertical)
+Output Count              : 1
+Model                     : Omni Flash</div>
+    </li>
+    <li>Haga clic en <strong>Save Settings</strong>.</li>
+    <li>Haga clic en el icono <code>+</code> → <strong>Upload Media</strong>.</li>
+    <li>Suba las 4 imágenes descargadas: Ficha de Personaje, Ficha de Producto, Ficha de Locación e Imagen de Storyboard Completo.</li>
+    <li>Haga clic en <strong>Add to prompt</strong> en cada una de las 4 imágenes para vincularlas formalmente a la orden del agente.</li>
+    <li>Presione el botón de ejecución y deje que el agente procese todo el comercial.</li>
+  </ol>
+
+  <div class="box warn">
+    <p style="margin:0;"><strong>Punto crítico:</strong> si olvidas el paso <strong>Add to prompt</strong>, las imágenes quedan subidas pero no forman parte de la orden. El agente generará algo genérico y el personaje cambiará entre tomas.</p>
+  </div>
+
+  <h2>Postproducción — Montaje, edición y exportación</h2>
+  <p>Una vez descargados todos los clips generados y corregidos desde Google Flow, pasamos a la fase de postproducción (CapCut, Premiere Pro o DaVinci Resolve).</p>
+
+  <ol class="steps">
+    <li><strong>Organización de archivos:</strong> cambie el nombre de cada archivo descargado siguiendo el orden de la historia (<code>Secuencia_1.mp4</code>, <code>Secuencia_2.mp4</code>, <code>Secuencia_3.mp4</code>…).</li>
+    <li><strong>Importación:</strong> abra CapCut, cree un nuevo proyecto e importe todos los clips.</li>
+    <li><strong>Limpieza de fotogramas (trimming):</strong> coloque los clips en la línea de tiempo y recorte los primeros o últimos fotogramas que contengan fallas visuales o movimientos extraños.</li>
+    <li><strong>Unión de mitades buenas:</strong> si aplicó la técnica del "Frankenstein publicitario", una la primera mitad limpia de un clip con la segunda mitad limpia de otro.</li>
+    <li><strong>Control de ritmo (pacing):</strong> si una toma se siente lenta, aumente la velocidad de reproducción ligeramente (por ejemplo, a 1.1x o 1.2x).</li>
+    <li><strong>Mezcla de audio:</strong> seleccione una pista de música de estilo comercial cinematográfico.</li>
+    <li><strong>Ajuste de volumen:</strong> fije la música entre <strong>4 y 10</strong> (bajo) para que la locución se escuche con total claridad.</li>
+    <li><strong>Exportación:</strong> revise la vista previa completa y exporte en resolución 4K o 1080p a 30/60 fps.</li>
+  </ol>
+</section>
+
+<!-- ============================================================
+     PANEL: PRÁCTICA
+     ============================================================ -->
+<section class="panel" id="p-practica" role="tabpanel" aria-label="Práctica">
+
+  <h1>Práctica</h1>
+  <p class="lead">Ejercicios, casos de uso y una lista de progreso que se guarda en tu navegador.</p>
+
+  <h2>Lista de comprobación de aprendizaje</h2>
+  <p>Marca cada punto cuando lo hayas completado de verdad. Tu progreso se guarda automáticamente en este navegador.</p>
+
+  <div class="ck-bar"><div id="ckFill"></div></div>
+  <p id="ckText" style="font-size:.85rem;color:var(--muted);margin-top:0;">0 de 12 completados (0 %)</p>
+
+  <ul class="ck-list" id="ckList">
+    <li><input type="checkbox" data-ck="c1" id="c1"><label for="c1"><span>Tengo el Master Prompt Principal cargado en ChatGPT y el flujo se inició.</span></label></li>
+    <li><input type="checkbox" data-ck="c2" id="c2"><label for="c2"><span>Subí una foto frontal y nítida de mi personaje.</span></label></li>
+    <li><input type="checkbox" data-ck="c3" id="c3"><label for="c3"><span>Descargué la Ficha de Personaje (sin producto, sin locación).</span></label></li>
+    <li><input type="checkbox" data-ck="c4" id="c4"><label for="c4"><span>Subí varias fotos reales de mi producto desde distintos ángulos.</span></label></li>
+    <li><input type="checkbox" data-ck="c5" id="c5"><span>Descargué la Ficha de Producto (sin persona sosteniéndolo).</span></label></li>
+    <li><input type="checkbox" data-ck="c6" id="c6"><span>Descargué la Ficha de Locación vacía, sin personas ni viñetas.</span></label></li>
+    <li><input type="checkbox" data-ck="c7" id="c7"><span>Elegí uno de los 10 conceptos y definí la duración (45s o 50s).</span></label></li>
+    <li><input type="checkbox" data-ck="c8" id="c8"><span>Revisé el guión y comprobé que sigue la estructura HOOK → MENSAJE DE MARCA.</span></label></li>
+    <li><input type="checkbox" data-ck="c9" id="c9"><span>Revisé la tabla de storyboard técnico (8 a 12 tomas).</span></label></li>
+    <li><input type="checkbox" data-ck="c10" id="c10"><span>Descargué la Imagen de Storyboard Completo.</span></label></li>
+    <li><input type="checkbox" data-ck="c11" id="c11"><span>Hice el control de calidad de los 4 activos y ninguno está contaminado.</span></label></li>
+    <li><input type="checkbox" data-ck="c12" id="c12"><span>En Google Flow: Agent Mode activo, ajustes guardados y las 4 imágenes con "Add to prompt".</span></label></li>
+  </ul>
+
+  <div class="tool-group" style="margin-top:10px;">
+    <button class="tbtn" id="ckReset" type="button">Reiniciar progreso</button>
+  </div>
+
+  <h2>Ejercicios prácticos con solución explicada</h2>
+
+  <details>
+    <summary>Ejercicio 1 — La locación contaminada</summary>
+    <div class="det-body">
+      <p><strong>Problema:</strong> generó la Ficha de Locación para un anuncio de café y en la foto aparece una mujer sosteniendo una taza de café en una mesa.</p>
+      <p><strong>Pregunta:</strong> ¿es correcto usar esta imagen para Google Flow? ¿Por qué?</p>
+      <p><strong>Solución explicada:</strong> no, es incorrecto. Viola la regla de separación de activos (<em>Future-Stage Protection</em>). Debe solicitar a ChatGPT que regenere la Ficha de Locación mostrando únicamente el ambiente de la cafetería, sin personas ni productos.</p>
+      <p><strong>Comando a usar:</strong> <code>"Regenerate ONLY the Location Sheet without any people, products or storyboard panels"</code></p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Ejercicio 2 — El diálogo truncado</summary>
+    <div class="det-body">
+      <p><strong>Problema:</strong> en Google Flow, el actor dice la mitad de la frase final y el video se corta abruptamente a los 4 segundos.</p>
+      <p><strong>Pregunta:</strong> ¿cómo se resuelve este fallo?</p>
+      <p><strong>Solución explicada:</strong> utilice la función <em>Reuse Prompt</em> en esa toma. Modifique el parámetro de duración del prompt aumentándolo de 45s a 50s o 60s. Esto otorga al motor de video el margen de tiempo necesario para completar la locución.</p>
+      <p><strong>Clave del diagnóstico:</strong> el problema no es el texto del guión ni la IA, sino un descalce matemático entre la longitud del diálogo y la duración asignada al clip.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Ejercicio 3 — El producto que cambia de forma</summary>
+    <div class="det-body">
+      <p><strong>Problema:</strong> en la segunda toma, el logotipo del producto aparece con otra tipografía y el color es ligeramente distinto.</p>
+      <p><strong>Pregunta:</strong> ¿qué dos cosas debes revisar?</p>
+      <p><strong>Solución explicada:</strong>
+        primero, comprueba que la Ficha de Producto fue marcada con <strong>Add to prompt</strong> en Google Flow (si no lo está, la imagen no forma parte de la orden);
+        segundo, revisa si tu Ficha de Producto incluye suficientes ángulos y un primer plano claro del logotipo. Si falta, sube más fotos reales de detalle a ChatGPT y regenera la ficha.
+      </p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Ejercicio 4 — El animal que habla</summary>
+    <div class="det-body">
+      <p><strong>Problema:</strong> tu comercial incluye un perro y el guión generado le asigna una frase hablada.</p>
+      <p><strong>Pregunta:</strong> ¿es aceptable?</p>
+      <p><strong>Solución explicada:</strong> no. La regla absoluta del método dice que los animales <strong>nunca</strong> deben hablar idioma humano ni tener diálogos. Su comunicación debe ser exclusivamente mediante sonidos naturales (ladridos, maullidos), movimientos corporales o expresiones faciales. Pide a ChatGPT que reescriba esa parte del guión sustituyendo el diálogo por una acción o un sonido natural.</p>
+    </div>
+  </details>
+
+  <h2>Casos de uso reales</h2>
+  <div class="grid">
+    <div class="mini">
+      <h4>Agencias y marketing</h4>
+      <p>Creación de anuncios para redes sociales (Instagram, TikTok, YouTube) y televisión con presupuestos reducidos.</p>
+    </div>
+    <div class="mini">
+      <h4>E-commerce y productos</h4>
+      <p>Demostración visual fotorrealista de productos físicos antes o durante su comercialización (auriculares, cosméticos, tecnología).</p>
+    </div>
+    <div class="mini">
+      <h4>Creadores y cineastas</h4>
+      <p>Prototipado rápido de spots publicitarios y carpetas de presentación visual para clientes (<em>pitch decks</em>).</p>
+    </div>
+  </div>
+
+  <h2>Práctica guiada: tu primer spot en 10 minutos de planificación</h2>
+  <ol class="steps">
+    <li>Elige un producto real que tengas en casa y hazle 5 fotos: frente, perfil, trasera, cenital y detalle del logo.</li>
+    <li>Elige una persona y consigue una foto suya con luz frontal y rostro despejado.</li>
+    <li>Carga el Master Prompt Principal en ChatGPT.</li>
+    <li>Sigue las etapas 1, 2 y 3 sin saltarte ninguna.</li>
+    <li>Cuando llegues a los 10 conceptos, elige el que tenga el hook más claro en 3 segundos.</li>
+    <li>Pide 45 segundos de duración.</li>
+    <li>Revisa la tabla de tomas y comprueba que cada toma tenga cámara, acción y locución.</li>
+  </ol>
+</section>
+
+<!-- ============================================================
+     PANEL: ERRORES
+     ============================================================ -->
+<section class="panel" id="p-errores" role="tabpanel" aria-label="Errores">
+
+  <h1>Errores, diagnóstico y solución</h1>
+  <p class="lead">En la producción de video con IA es normal que ocurran fallos. La clave del profesional no es esperar un resultado perfecto a la primera, sino <strong>saber identificar la causa y corregir la variable exacta</strong>.</p>
+
+  <h2>Caso real 1 — Objeto no deseado en la escena (pantalla fantasma)</h2>
+  <h3>El problema</h3>
+  <p>En la primera toma generada apareció una pantalla de notificación no deseada en la tapa trasera de la computadora portátil del personaje.</p>
+  <h3>La solución paso a paso</h3>
+  <ol class="steps">
+    <li>Haga clic en la opción <strong>Reuse Prompt</strong> específica de ese clip en Google Flow.</li>
+    <li>Ejecute la regeneración.</li>
+    <li>Compare el resultado con el clip original.</li>
+  </ol>
+  <div class="box">
+    <p style="margin:0;"><strong>Observación de experto:</strong> si la regeneración arregla el final de la toma pero mantiene un pequeño detalle en los primeros segundos, <strong>no descarte el archivo</strong>. En el editor de video (CapCut) unirá la primera mitad limpia del video original con la segunda mitad limpia del video regenerado.</p>
+  </div>
+
+  <h2>Caso real 2 — Diálogo o locución cortada antes de tiempo</h2>
+  <h3>El problema</h3>
+  <p>En la toma del cierre de marca, el personaje habla pero el video se corta a los 5 segundos, antes de que termine de decir la frase completa.</p>
+  <h3>Análisis del error</h3>
+  <p>El problema <strong>no es el texto del prompt ni la IA</strong>, sino un descalce matemático entre la longitud del diálogo y la duración asignada al clip.</p>
+  <h3>La solución paso a paso</h3>
+  <ol class="steps">
+    <li>Haga clic en <strong>Reuse Prompt</strong>.</li>
+    <li>En los parámetros de instrucción del prompt, busque la variable de duración.</li>
+    <li>Auméntela ligeramente (por ejemplo, de <code>45 seconds</code> a <code>50 seconds</code>).</li>
+    <li>Ejecute de nuevo la generación.</li>
+  </ol>
+  <p>Con esos 5 segundos extra, el personaje tendrá tiempo suficiente para pronunciar todo el diálogo correctamente.</p>
+
+  <h2>Tabla de diagnóstico y solución de errores comunes</h2>
+  <table>
+    <thead>
+      <tr><th>Error observado</th><th>Causa raíz</th><th>Solución accionable</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>El rostro del personaje cambia entre tomas.</strong></td>
+        <td>El activo de personaje no quedó bien adjuntado al prompt.</td>
+        <td>Revisa que la <em>Character Sheet</em> esté marcada con <em>Add to prompt</em> en Google Flow y regenera.</td>
+      </tr>
+      <tr>
+        <td><strong>El producto tiene una forma o color diferente.</strong></td>
+        <td>Falta de ángulos en la Ficha de Producto.</td>
+        <td>Agrega fotos de perfil y detalle del producto real en ChatGPT y actualiza la ficha.</td>
+      </tr>
+      <tr>
+        <td><strong>El video dura muy poco y la voz se interrumpe.</strong></td>
+        <td>Conflicto de duración del clip.</td>
+        <td>Usa <em>Reuse Prompt</em> e incrementa el parámetro de tiempo a 50s o 60s.</td>
+      </tr>
+      <tr>
+        <td><strong>Aparecen artefactos visuales o manos deformes.</strong></td>
+        <td>Falla estocástica del modelo de video.</td>
+        <td>Ejecuta 1 o 2 iteraciones con <em>Reuse Prompt</em> o recorta los fotogramas defectuosos en montaje.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Errores que NUNCA deben cometerse</h2>
+  <div class="box bad">
+    <ol style="margin:0;">
+      <li><strong>NUNCA combine dos activos en una sola imagen.</strong> Crear la Ficha de Locación con el personaje dentro, o poner el storyboard en la Ficha de Producto, destruirá la coherencia en Google Flow.</li>
+      <li><strong>NUNCA deje que la IA invente el producto.</strong> Siempre debe subir fotos reales del producto desde varios ángulos para preservar logotipos, acabados y botones.</li>
+      <li><strong>NUNCA haga hablar a los animales.</strong> Los animales en comerciales de IA deben comunicarse solo con movimientos y sonidos naturales.</li>
+      <li><strong>NUNCA descarte una toma completa por un error de un segundo.</strong> Recorte la parte defectuosa en CapCut y combine la parte buena con otra generación.</li>
+    </ol>
+  </div>
+
+  <h2>Protocolo general de corrección</h2>
+  <ol class="steps">
+    <li><strong>Identifica el síntoma exacto.</strong> ¿Es el rostro? ¿Es el producto? ¿Es la duración? ¿Es un artefacto?</li>
+    <li><strong>Localiza la variable responsable</strong> en la tabla de diagnóstico.</li>
+    <li><strong>Toca solo esa variable.</strong> No regeneres todo el proyecto por un fallo localizado.</li>
+    <li><strong>Usa Reuse Prompt</strong> para mantener el contexto de la toma.</li>
+    <li><strong>Compara</strong> el clip nuevo con el anterior antes de descartar nada.</li>
+    <li><strong>Si el fallo es de 1 segundo,</strong> resuélvelo en montaje, no en generación.</li>
+  </ol>
+</section>
+
+<!-- ============================================================
+     PANEL: PROMPTS
+     ============================================================ -->
+<section class="panel" id="p-prompts" role="tabpanel" aria-label="Prompts">
+
+  <h1>Compendio de prompts</h1>
+  <p class="lead">Todos los textos del método, listos para copiar y pegar. Este compendio reúne los diez prompts que articulan la producción completa: desde el Master Prompt Principal de preproducción en ChatGPT hasta los comandos de iteración en Google Flow Agent Mode.</p>
+
+  <div id="promptsMount"></div>
+
+</section>
+
+<!-- ============================================================
+     PANEL: RESUMEN
+     ============================================================ -->
+<section class="panel" id="p-resumen" role="tabpanel" aria-label="Resumen">
+
+  <h1>Resumen general</h1>
+
+  <h2>Todo lo aprendido en tres bloques</h2>
+  <div class="grid">
+    <div class="mini">
+      <div class="num">1</div>
+      <h4>Preproducción en ChatGPT</h4>
+      <p>Mediante el Master Prompt de 24 páginas y el comando <code>next</code>, bloqueamos de forma secuencial al personaje, al producto y a la locación en fichas de referencia independientes. Después creamos el guión, la tabla de storyboard y la Imagen de Storyboard Completo.</p>
+    </div>
+    <div class="mini">
+      <div class="num">2</div>
+      <h4>Producción en Google Flow Agent Mode</h4>
+      <p>Importamos el Master Prompt Final junto a las 4 imágenes de referencia y dejamos que el agente genere el anuncio de forma autónoma con coherencia estética.</p>
+    </div>
+    <div class="mini">
+      <div class="num">3</div>
+      <h4>Troubleshooting y postproducción</h4>
+      <p>Diagnosticamos fallas (diálogos cortados, glitches), corregimos variables con <em>Reuse Prompt</em> y realizamos el montaje, ritmo y sonido en CapCut.</p>
+    </div>
+  </div>
+
+  <h2>Lista de conceptos clave</h2>
+  <table>
+    <thead><tr><th>Concepto</th><th>Definición breve</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Agent Mode</strong></td><td>Modo de trabajo autónomo en Google Flow que ejecuta un plan de producción completo interpretando texto e imágenes.</td></tr>
+      <tr><td><strong>Character Lock / Product Lock / Location Lock</strong></td><td>Congelar la apariencia de un personaje, producto o escenario para que la IA no los modifique en tomas posteriores.</td></tr>
+      <tr><td><strong>Future-Stage Protection</strong></td><td>Regla estricta que prohíbe generar activos visuales de etapas futuras antes de tiempo.</td></tr>
+      <tr><td><strong>Reuse Prompt</strong></td><td>Herramienta de Google Flow para regenerar una toma específica usando el contexto previo.</td></tr>
+      <tr><td><strong>Master Prompt</strong></td><td>Instrucción marco extensa que programa el comportamiento, rol y límites de la IA.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Las cuatro reglas de oro</h2>
+  <div class="box ok">
+    <ol style="margin:0;">
+      <li>Un activo visual = una imagen independiente. Nunca los mezcles.</li>
+      <li>Nunca generes un activo de una etapa futura antes de tiempo.</li>
+      <li>Nunca dejes que la IA invente el producto: sube fotos reales.</li>
+      <li>Nunca descartes una toma entera por un fallo de un segundo: recorta y combina.</li>
+    </ol>
+  </div>
+
+  <h2>Errores que nunca deben cometerse</h2>
+  <ul>
+    <li>❌ <strong>NUNCA combine dos activos en una sola imagen:</strong> crear la Ficha de Locación con el personaje dentro o poner el storyboard en la Ficha de Producto destruirá la coherencia en Google Flow.</li>
+    <li>❌ <strong>NUNCA deje que la IA invente el producto:</strong> siempre debe subir fotos reales del producto desde varios ángulos para preservar logotipos, acabados y botones.</li>
+    <li>❌ <strong>NUNCA haga hablar a los animales:</strong> los animales en comerciales de IA deben comunicarse solo con movimientos y sonidos naturales.</li>
+    <li>❌ <strong>NUNCA descarte una toma completa por un error de un segundo:</strong> recorte la parte defectuosa en CapCut y combine la parte buena con otra generación.</li>
+  </ul>
+
+  <h2>Recomendaciones para seguir aprendiendo</h2>
+  <ul>
+    <li>Experimente probando diferentes estilos visuales (por ejemplo <em>Luxury commercial</em>, <em>Futuristic commercial</em>, <em>Outdoor adventure</em>) modificando la configuración del Master Prompt.</li>
+    <li>Analice anuncios reales en AdForum y Vimeo para estudiar movimientos de cámara, lenguaje cinematográfico y cortes de ritmo.</li>
+    <li>Practique la resolución de problemas ajustando parámetros temporales y reescribiendo instrucciones puntuales.</li>
+  </ul>
+
+  <h2>Comprobación final antes de dar por terminado un spot</h2>
+  <ul>
+    <li>¿El personaje es el mismo en todas las tomas?</li>
+    <li>¿El producto conserva forma, color y logotipo?</li>
+    <li>¿La locación mantiene la misma arquitectura y luz?</li>
+    <li>¿El guión sigue la estructura HOOK → MENSAJE DE MARCA?</li>
+    <li>¿La música está a volumen bajo (4 a 10) y no tapa la locución?</li>
+    <li>¿El ritmo no tiene tomas muertas?</li>
+  </ul>
+</section>
+
+<!-- ============================================================
+     PANEL: FUENTES
+     ============================================================ -->
+<section class="panel" id="p-fuentes" role="tabpanel" aria-label="Fuentes">
+
+  <h1>Fuentes y recursos</h1>
+
+  <h2>Video de referencia</h2>
+  <div class="card">
+    <p><strong>Nombre del video:</strong> <em>How to Create Cinematic AI Commercials | ChatGPT + Google Flow Agent Mode (full course)</em></p>
+    <p><strong>Canal de YouTube:</strong> Lyra Ai</p>
+    <p><strong>URL:</strong><br>
+      <a href="https://youtube.com/watch?v=n9HKJsONtQ0&amp;is=YTZmZVRtUiqq-y2U" target="_blank" rel="noopener noreferrer">https://youtube.com/watch?v=n9HKJsONtQ0&amp;is=YTZmZVRtUiqq-y2U</a>
+    </p>
+  </div>
+
+  <h2>Fuentes y sus URLs</h2>
+  <table>
+    <thead><tr><th>Fuente</th><th>Descripción</th><th>URL</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Video curso completo en YouTube (Lyra Ai)</strong></td>
+        <td><em>How to Create Cinematic AI Commercials | ChatGPT + Google Flow Agent Mode (full course)</em></td>
+        <td><a href="https://youtube.com/watch?v=n9HKJsONtQ0&amp;is=YTZmZVRtUiqq-y2U" target="_blank" rel="noopener noreferrer">youtube.com/watch?v=n9HKJsONtQ0</a></td>
+      </tr>
+      <tr>
+        <td><strong>AdForum</strong></td>
+        <td>Plataforma de referencias publicitarias: anuncios organizados por categorías.</td>
+        <td><a href="https://www.adforum.com" target="_blank" rel="noopener noreferrer">adforum.com</a></td>
+      </tr>
+      <tr>
+        <td><strong>Ads of the World</strong></td>
+        <td>Plataforma de campañas creativas globales.</td>
+        <td><a href="https://www.adsoftheworld.com" target="_blank" rel="noopener noreferrer">adsoftheworld.com</a></td>
+      </tr>
+      <tr>
+        <td><strong>Vimeo — Advertising</strong></td>
+        <td>Sección de comerciales y anuncios cinematográficos.</td>
+        <td><a href="https://vimeo.com/categories/advertising" target="_blank" rel="noopener noreferrer">vimeo.com/categories/advertising</a></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="box">
+    <p style="margin:0;"><strong>Nota:</strong> los enlaces se abren en una pestaña nueva. Este tutorial funciona sin conexión; los enlaces solo se usan si usted decide consultar las fuentes originales.</p>
+  </div>
+</section>
+
+<!-- ============================================================
+     PANEL: CRÉDITOS
+     ============================================================ -->
+<section class="panel" id="p-creditos" role="tabpanel" aria-label="Créditos">
+
+  <h1>Créditos</h1>
+
+  <div class="hero-svg-mount" data-svg-hero="true" role="img"
+       aria-label="Esquema animado: cuatro activos visuales independientes (personaje, producto, locación y storyboard) alimentan a Google Flow Agent Mode, que produce la secuencia de un comercial cinematográfico."></div>
+  <p class="hero-caption">El mismo esquema que abre el tutorial: separar los activos y dejarlos converger en un único plan de producción.</p>
+
+  <div class="card">
+    <h2 style="margin-top:0;border:0;padding:0;">Autor</h2>
+    <p class="credit-role">Autor del tutorial</p>
+    <p class="credit-name">Rubén Sbarsky</p>
+    <p style="margin-top:14px;">Guía maestra de producción publicitaria cinematográfica con IA: de ChatGPT a Google Flow Agent Mode.</p>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0;">Fecha y hora de creación</h2>
+    <p>Este dato quedó grabado de forma fija en el archivo HTML en el momento de su creación. No se recalcula al abrir la página.</p>
+    <p><span class="stamp">02/10/2026 — 10:30:00</span></p>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0;">Versión del archivo</h2>
+    <p><span class="stamp">V001</span></p>
+    <p style="font-size:.86rem;color:var(--muted);">Si recibe una versión corregida de este tutorial, compruebe que el número de versión ha subido (V002, V003…) y que el nombre del archivo también ha cambiado. Así evita que el navegador le muestre una copia antigua guardada en caché.</p>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0;">Sobre este tutorial</h2>
+    <p>Este documento es una versión interactiva, ampliada y explicada del material base «Guía maestra de producción publicitaria cinematográfica con IA». El contenido se ha reorganizado para facilitar el aprendizaje, siguiendo la secuencia <strong>qué es → para qué sirve → por qué importa → cómo se hace → ejemplo → práctica → errores → resumen</strong>.</p>
+    <p>Todo el contenido de método (etapas, reglas, prompts, diagnóstico de errores y glosario) proviene del documento fuente. No se han añadido afirmaciones técnicas que no estén respaldadas por él.</p>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0;">Novedades de esta versión</h2>
+    <ul>
+      <li>Pestaña PROMPTS ampliada con el compendio completo de los 10 prompts del método, con índice interno navegable, descripción, uso y botón COPIAR individual.</li>
+      <li>Corregida la navegación del índice de prompts: los enlaces ahora desplazan correctamente hasta cada prompt sin desactivar el panel contenedor.</li>
+      <li>Botones COPIAR reforzados: funcionan en escritorio, móvil, file://, iframes, sin foco de ventana y con permisos de portapapeles denegados (con selección automática como último recurso).</li>
+      <li>Ilustración animada compartida entre INICIO y CRÉDITOS, generada desde una única plantilla.</li>
+      <li>Botón de impresión / guardado como PDF con hoja de estilo de impresión completa.</li>
+      <li>Buscador interno, control de tamaño de letra y modo claro / oscuro.</li>
+      <li>Lista de comprobación con progreso guardado en el navegador.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================================================
+     AVISO DE IMPRESIÓN
+     ============================================================ -->
+<div id="printNotice" class="print-notice" role="status">
+  <strong>No se pudo abrir el diálogo de impresión.</strong><br>
+  Es probable que este archivo esté abriéndose dentro de un visor o previsualizador.
+  Ábrelo directamente en el navegador (no dentro de un visor) y pulsa
+  <kbd>Ctrl</kbd>+<kbd>P</kbd> (Windows/Linux) o <kbd>Cmd</kbd>+<kbd>P</kbd> (Mac).
+  <br>
+  <button class="copyBtn" type="button" id="closeNotice">Cerrar aviso</button>
+</div>
+
+<!-- ============================================================
+     VOLVER ARRIBA
+     ============================================================ -->
+<button class="to-top" id="toTop" type="button" title="Volver arriba" aria-label="Volver arriba">↑</button>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ==========================================================
+     1. SVG ANIMADO — PLANTILLA ÚNICA + MONTAJE POR innerHTML
+     ========================================================== */
+  var seq = 0, TPL = null, imgMode = false;
+
+  function template() {
+    if (TPL) return TPL;
+    var src = document.getElementById('svgHeroSource');
+    if (!src) return { defs: '', art: '' };
+    var defsNode = src.querySelector('defs');
+    var gNode = src.querySelector('#svgHero');
+    if (!defsNode || !gNode) return { defs: '', art: '' };
+
+    var d = defsNode.cloneNode(true);
+    var g = gNode.cloneNode(true);
+    var inner = d.querySelector('#svgHero');
+    if (inner && inner.parentNode) inner.parentNode.removeChild(inner);
+    g.removeAttribute('id');
+
+    TPL = { defs: d.innerHTML, art: g.outerHTML };
+
+    if (src.parentNode) src.parentNode.removeChild(src);
+    return TPL;
+  }
+
+  function markup(uid) {
+    var t = template();
+    var s = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 260" width="100%" '
+          + 'preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">'
+          + '<defs>' + t.defs + '</defs>' + t.art + '</svg>';
+
+    ['gBg', 'gAcc', 'fGlow'].forEach(function (id) {
+      s = s.split('id="' + id + '"').join('id="' + id + '-' + uid + '"')
+           .split('url(#' + id + ')').join('url(#' + id + '-' + uid + ')');
+    });
+    return s;
+  }
+
+  function mountOne(m) {
+    if (!m) return;
+    m.textContent = '';
+
+    if (imgMode) {
+      var im = document.createElement('img');
+      im.alt = m.getAttribute('aria-label') || '';
+      im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(markup('i' + (++seq)));
+      m.appendChild(im);
+      return;
+    }
+
+    m.innerHTML = markup('h' + (++seq));
+    var svg = m.querySelector('svg');
+    if (!svg) return;
+
+    try { svg.setCurrentTime(0); svg.unpauseAnimations(); } catch (e) {}
+
+    var t0 = 0;
+    try { t0 = svg.getCurrentTime(); } catch (e) { t0 = 0; }
+
+    setTimeout(function () {
+      if (document.hidden) return;
+      if (m.querySelector('svg') !== svg) return;
+      var t1 = t0 + 1;
+      try { t1 = svg.getCurrentTime(); } catch (e) { t1 = t0 + 1; }
+      if (svg.getBoundingClientRect().height > 0 && (t1 - t0) < 0.3) {
+        imgMode = true;
+        mountOne(m);
+      }
+    }, 1600);
+  }
+
+  function mountActive() {
+    var list = document.querySelectorAll('.panel.active [data-svg-hero]');
+    Array.prototype.forEach.call(list, function (m) { mountOne(m); });
+  }
+
+  setInterval(function () {
+    if (document.hidden) return;
+    var list = document.querySelectorAll('.panel.active [data-svg-hero]');
+    Array.prototype.forEach.call(list, function (m) {
+      if (!m.firstElementChild) mountOne(m);
+    });
+  }, 800);
+
+  /* ==========================================================
+     2. PESTAÑAS
+     ========================================================== */
+  var tabs = document.querySelectorAll('.tab');
+  var panels = document.querySelectorAll('.panel');
+
+  function activateTab(id, scroll) {
+    /* CORREGIDO: si el id no corresponde a un panel, no tocar nada.
+       Antes se desactivaban todos los paneles y luego se salía por el
+       `return false`, dejando el tutorial en blanco al pulsar un enlace
+       del índice de prompts (que apunta a secciones internas, no a
+       paneles). */
+    var target = document.getElementById(id);
+    if (!target || !target.classList.contains('panel')) return false;
+
+    Array.prototype.forEach.call(panels, function (p) {
+      p.classList.toggle('active', p.id === id);
+    });
+
+    Array.prototype.forEach.call(tabs, function (t) {
+      var on = (t.getAttribute('data-target') === id);
+      t.classList.toggle('active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+
+    mountActive();
+
+    if (history.replaceState) {
+      history.replaceState(null, '', '#' + id);
+    } else {
+      location.hash = id;
+    }
+
+    if (scroll) {
+      try { window.scrollTo({ top: 0, behavior: 'auto' }); } catch (e) { window.scrollTo(0, 0); }
+    }
+    return true;
+  }
+
+  Array.prototype.forEach.call(tabs, function (t) {
+    t.addEventListener('click', function () {
+      activateTab(t.getAttribute('data-target'), true);
+    });
+  });
+
+  /* CORREGIDO: distinguir entre hash de panel y hash de anchor interno. */
+  window.addEventListener('hashchange', function () {
+    var id = location.hash.replace('#', '');
+    if (!id) return;
+    var el = document.getElementById(id);
+    if (!el) return;
+
+    if (el.classList.contains('panel')) {
+      activateTab(id, false);
+      return;
+    }
+
+    /* Anchor interno (por ejemplo, una sección de prompt). */
+    var panel = el.closest ? el.closest('.panel') : null;
+    if (panel && !panel.classList.contains('active')) {
+      activateTab(panel.id, false);
+    }
+    setTimeout(function () {
+      try {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (e) {
+        el.scrollIntoView();
+      }
+    }, 40);
+  });
+
+  /* CORREGIDO: manejador propio para los enlaces del índice de prompts.
+     Hace preventDefault para evitar que el navegador cambie el hash de
+     forma brusca, activa el panel contenedor si hiciera falta, actualiza
+     la URL silenciosamente con replaceState y luego hace scroll suave. */
+  function bindIndexLinks() {
+    var links = document.querySelectorAll('.prompt-index a[href^="#"]');
+    Array.prototype.forEach.call(links, function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        var targetId = a.getAttribute('href').replace('#', '');
+        var el = document.getElementById(targetId);
+        if (!el) return;
+
+        var panel = el.closest ? el.closest('.panel') : null;
+        if (panel && !panel.classList.contains('active')) {
+          activateTab(panel.id, false);
+        }
+
+        if (history.replaceState) {
+          history.replaceState(null, '', '#' + targetId);
+        }
+
+        /* Esperar un tick a que el panel termine de hacerse visible antes
+           de calcular la posición del scroll. */
+        setTimeout(function () {
+          try {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } catch (e) {
+            el.scrollIntoView();
+          }
+        }, 40);
+      });
+    });
+  }
+
+  /* ==========================================================
+     3. BUSCADOR
+     ========================================================== */
+  var searchInput = document.getElementById('searchInput');
+  var searchInfo  = document.getElementById('searchInfo');
+  var searchTimer = null;
+
+  function clearHighlights() {
+    var marks = document.querySelectorAll('mark.search-hl');
+    Array.prototype.forEach.call(marks, function (mk) {
+      var p = mk.parentNode;
+      if (!p) return;
+      p.replaceChild(document.createTextNode(mk.textContent), mk);
+      p.normalize();
+    });
+  }
+
+  function updateSearchInfo(n) {
+    if (!searchInfo) return;
+    if (!searchInput.value || searchInput.value.length < 2) { searchInfo.textContent = ''; return; }
+    searchInfo.textContent = n === 0 ? 'sin resultados' : (n + (n === 1 ? ' coincidencia' : ' coincidencias'));
+  }
+
+  function runSearch(q) {
+    clearHighlights();
+    if (!q || q.length < 2) { updateSearchInfo(0); return; }
+
+    var lower = q.toLowerCase();
+    var total = 0;
+    var firstMark = null;
+    var firstPanelId = null;
+
+    Array.prototype.forEach.call(panels, function (panel) {
+      var walker = document.createTreeWalker(panel, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (node) {
+          if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+          var p = node.parentNode;
+          if (!p) return NodeFilter.FILTER_REJECT;
+          var tag = p.nodeName.toLowerCase();
+          if (tag === 'script' || tag === 'style' || tag === 'mark' || tag === 'textarea') {
+            return NodeFilter.FILTER_REJECT;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      });
+
+      var nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+
+      nodes.forEach(function (node) {
+        var text = node.nodeValue;
+        var lt = text.toLowerCase();
+        var idx = lt.indexOf(lower);
+        if (idx === -1) return;
+
+        var frag = document.createDocumentFragment();
+        var pos = 0;
+        var i;
+        while ((i = lt.indexOf(lower, pos)) !== -1) {
+          if (i > pos) frag.appendChild(document.createTextNode(text.slice(pos, i)));
+          var mk = document.createElement('mark');
+          mk.className = 'search-hl';
+          mk.textContent = text.slice(i, i + q.length);
+          frag.appendChild(mk);
+          if (!firstMark) { firstMark = mk; firstPanelId = panel.id; }
+          pos = i + q.length;
+          total++;
+        }
+        if (pos < text.length) frag.appendChild(document.createTextNode(text.slice(pos)));
+        if (node.parentNode) node.parentNode.replaceChild(frag, node);
+      });
+    });
+
+    updateSearchInfo(total);
+
+    if (total > 0) {
+      var active = document.querySelector('.panel.active');
+      var activeHas = active && active.querySelector('mark.search-hl');
+      if (!activeHas && firstPanelId) activateTab(firstPanelId, false);
+      if (firstMark && firstMark.scrollIntoView) {
+        try { firstMark.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+      }
+    }
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', function () {
+      clearTimeout(searchTimer);
+      var val = searchInput.value;
+      searchTimer = setTimeout(function () { runSearch(val.trim()); }, 320);
+    });
+    searchInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        clearTimeout(searchTimer);
+        runSearch(searchInput.value.trim());
+      }
+    });
+  }
+
+  /* ==========================================================
+     4. TAMAÑO DE TEXTO
+     ========================================================== */
+  var FS_MIN = 13, FS_MAX = 22;
+  var currentFS = parseInt(localStorage.getItem('tut_fs') || '16', 10);
+  if (isNaN(currentFS)) currentFS = 16;
+  currentFS = Math.max(FS_MIN, Math.min(FS_MAX, currentFS));
+
+  function applyFS(v) {
+    currentFS = Math.max(FS_MIN, Math.min(FS_MAX, v));
+    document.documentElement.style.setProperty('--fs', currentFS + 'px');
+    try { localStorage.setItem('tut_fs', String(currentFS)); } catch (e) {}
+  }
+  applyFS(currentFS);
+
+  var btnMinus = document.getElementById('btnMinus');
+  var btnPlus  = document.getElementById('btnPlus');
+  if (btnMinus) btnMinus.addEventListener('click', function () { applyFS(currentFS - 1); });
+  if (btnPlus)  btnPlus.addEventListener('click',  function () { applyFS(currentFS + 1); });
+
+  /* ==========================================================
+     5. MODO CLARO / OSCURO
+     ========================================================== */
+  var btnTheme = document.getElementById('btnTheme');
+
+  function applyTheme(light) {
+    document.documentElement.classList.toggle('light', light);
+    if (btnTheme) btnTheme.textContent = light ? '☾ Oscuro' : '☀︎ Claro';
+    try { localStorage.setItem('tut_theme', light ? 'light' : 'dark'); } catch (e) {}
+  }
+
+  var savedTheme = 'dark';
+  try { savedTheme = localStorage.getItem('tut_theme') || 'dark'; } catch (e) {}
+  applyTheme(savedTheme === 'light');
+
+  if (btnTheme) {
+    btnTheme.addEventListener('click', function () {
+      applyTheme(!document.documentElement.classList.contains('light'));
+    });
+  }
+
+  /* ==========================================================
+     6. COPIAR PROMPTS
+     ========================================================== */
+  function legacyCopy(text){
+    return new Promise(function(resolve, reject){
+      var ta = null;
+      var prevActive = null;
+      try{
+        prevActive = document.activeElement;
+
+        ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.setAttribute('aria-hidden', 'true');
+        ta.style.position = 'fixed';
+        ta.style.top = '0';
+        ta.style.left = '-9999px';
+        ta.style.width = '2em';
+        ta.style.height = '2em';
+        ta.style.padding = '0';
+        ta.style.border = 'none';
+        ta.style.outline = 'none';
+        ta.style.boxShadow = 'none';
+        ta.style.background = 'transparent';
+
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try{ ta.setSelectionRange(0, ta.value.length); }catch(_e){}
+
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        ta = null;
+
+        if(prevActive && typeof prevActive.focus === 'function'){
+          try{ prevActive.focus(); }catch(_e){}
+        }
+
+        ok ? resolve() : reject(new Error('execCommand("copy") devolvió false'));
+      }catch(err){
+        if(ta && ta.parentNode){ try{ ta.parentNode.removeChild(ta); }catch(_e){} }
+        reject(err);
+      }
+    });
+  }
+
+  function copyText(text){
+    if(navigator.clipboard
+       && window.isSecureContext
+       && typeof navigator.clipboard.writeText === 'function'){
+      return navigator.clipboard.writeText(text).catch(function(){
+        return legacyCopy(text);
+      });
+    }
+    return legacyCopy(text);
+  }
+
+  function bindCopyButton(btn){
+    if (!btn || btn.dataset.copyBound === '1') return;
+    btn.dataset.copyBound = '1';
+    btn.addEventListener('click', function(){
+      var box = btn.closest('.promptBox');
+      if(!box) return;
+      var body = box.querySelector('.promptBody');
+      if(!body) return;
+
+      copyText(body.textContent).then(function(){
+        var original = btn.textContent;
+        btn.textContent = '✓ Copiado';
+        btn.classList.add('done');
+        setTimeout(function(){
+          btn.textContent = original;
+          btn.classList.remove('done');
+        }, 1800);
+      }).catch(function(){
+        try{
+          var range = document.createRange();
+          range.selectNodeContents(body);
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }catch(e){}
+        var original = btn.textContent;
+        btn.textContent = 'Selecciona y copia';
+        setTimeout(function(){ btn.textContent = original; }, 2200);
+      });
+    });
+  }
+
+  function bindAllCopyButtons(){
+    var btns = document.querySelectorAll('.promptBox .copyBtn');
+    Array.prototype.forEach.call(btns, bindCopyButton);
+  }
+
+  /* ==========================================================
+     6b. CONSTRUCCIÓN DINÁMICA DE LA PESTAÑA PROMPTS
+     ========================================================== */
+  var PROMPTS = [
+    {
+      id: 'prompt-master',
+      title: '1. Master Prompt Principal: Director Creativo Publicitario IA',
+      desc: 'Prompt marco extenso que configura la personalidad y las limitaciones operativas de la IA. Define un flujo de trabajo estrictamente secuencial de 11 etapas obligatorias y prohíbe expresamente saltarse pasos, combinar varias hojas de referencia en una sola imagen o inventar elementos (como el storyboard) antes de tiempo. Los cuatro activos visuales (Personaje, Producto, Locación y Storyboard) deben ser siempre imágenes independientes.',
+      uso: 'Se copia y pega en ChatGPT al iniciar la sesión de preproducción, como primer y único mensaje antes de empezar a trabajar. Es el punto de partida absoluto del método: sin él, la IA no asume el rol de Director Creativo, no respeta el orden de las etapas y no aplica el Character Lock, Product Lock ni Location Lock.',
+      text: 'You are my expert commercial creative director, advertising screenwriter, character designer, product visual designer, location designer, storyboard artist, and AI video production planner.\n\nYour job is to develop a complete short commercial package for a modern American audience.\nThe final package will be given to Flow AI Agent Mode to generate the actual commercial.\n\nDo not explain this instruction. Do not discuss tutorials. Do not discuss YouTube strategy. Do not give generic advice.\nWork through the commercial creation process step by step.\n\n============================================================\nCORE PRODUCTION PRINCIPLE\n============================================================\nThis is a STRICT SEQUENTIAL PRODUCTION WORKFLOW.\nYou MUST complete each stage separately.\nNEVER combine two different stages into one image.\nNEVER generate future-stage assets early.\nNEVER predict or anticipate a future stage.\nNEVER create storyboard assets before the storyboard stage.\nNEVER create a storyboard inside a location sheet.\nNEVER create a location sheet inside a storyboard.\n\nEach major visual reference must be an independent image.\nThe four major visual assets are ALWAYS separate:\n1. CHARACTER REFERENCE SHEET IMAGE\n2. PRODUCT REFERENCE SHEET IMAGE\n3. LOCATION REFERENCE SHEET IMAGE\n4. COMPLETE STORYBOARD IMAGE\nThese must NEVER be merged into one image.\n\n============================================================\nPRODUCTION STAGE LOCK\n============================================================\nThe workflow must follow this exact order:\nSTAGE 1 — CHARACTER REFERENCE INTAKE + CHARACTER SHEET\nSTAGE 2 — PRODUCT REFERENCE INTAKE + PRODUCT SHEET\nSTAGE 3 — LOCATION REFERENCE INTAKE + LOCATION SHEET\nSTAGE 4 — GENERATE 10 COMMERCIAL CONCEPTS\nSTAGE 5 — USER SELECTS ONE CONCEPT\nSTAGE 6 — ASK FOR DURATION\nSTAGE 7 — WRITE COMMERCIAL SCRIPT\nSTAGE 8 — CREATE STORYBOARD PLAN\nSTAGE 9 — CREATE COMPLETE STORYBOARD IMAGE\nSTAGE 10 — FINAL FLOW AI AGENT MASTER PROMPT\n\nDo not skip stages. Do not merge stages. Do not generate a later-stage visual during an earlier stage.\n\n============================================================\nSTAGE 1 — CHARACTER REFERENCE INTAKE\n============================================================\nFIRST ASK ONLY:\n"Do you already have a character image you want to use?"\nGive exactly two choices:\nYES — I will provide the character image.\nNO — I will provide the character image later.\n\nIMPORTANT: You MUST NOT create a character yourself. You MUST NOT invent a character.\nThe character identity must come from the user\'s supplied image.\nIf the user selects YES, wait for the character image.\nIf the user selects NO, allow the user to continue without creating an invented character.\n\n============================================================\nCHARACTER IMAGE ANALYSIS\n============================================================\nWhen the user provides the character image:\nUse the supplied character image as the PRIMARY CHARACTER IDENTITY.\nAnalyze the image carefully.\nPreserve: Face structure, Facial features, Skin tone, Eye color, Eye shape, Nose, Lips, Jawline, Hair color, Hairstyle, Age appearance, Body proportions, Body type, Height appearance, Distinctive physical characteristics, Overall identity.\nDO NOT redesign the person\'s identity. DO NOT replace the face. DO NOT create a different person.\n\n============================================================\nCHARACTER SHEET\n============================================================\nCreate a detailed CHARACTER SHEET based ONLY on the supplied character image.\nInclude: Name, Age, Gender, Face shape, Facial features, Skin tone, Eye color, Hair color, Hairstyle, Body type, Height, Clothing, Shoes, Accessories, Personality, Voice characteristics, Distinctive visual characteristics, Character consistency rules.\n\nThen create ONE SEPARATE HIGH-QUALITY CHARACTER REFERENCE SHEET IMAGE.\nThe Character Reference Sheet Image should show the SAME PERSON from useful angles and/or expressions (Face, Profile, Expression, Full body, Clothing, Body proportions).\nDO NOT include product, location, or storyboard elements.\n\nLOCK THE CHARACTER IDENTITY.\n\n============================================================\nSTAGE 2 — PRODUCT REFERENCE INTAKE\n============================================================\nAfter the character stage, ask ONLY:\n"Do you already have a product image you want to use?"\nGive exactly two choices:\nYES — I will provide the product image.\nNO — I will provide the product image later.\n\nWhen the user provides the product image: Analyze and preserve shape, dimensions, materials, colors, finish, buttons, controls, display, logos, branding, text, and unique features.\nCreate a detailed PRODUCT SHEET and ONE SEPARATE HIGH-QUALITY PRODUCT REFERENCE SHEET IMAGE (showing front, left, right, rear, top, and detail views).\nLOCK THE PRODUCT DESIGN.\n\n============================================================\nSTAGE 3 — LOCATION REFERENCE INTAKE\n============================================================\nAfter the product stage, ask ONLY:\n"Do you already have a location image you want to use?"\nGive exactly two choices:\nYES — I will provide the location image.\nNO — Create the location yourself.\n\nIf YES: Analyze architecture, layout, furniture, materials, colors, lighting.\nIf NO: Design a suitable location for a modern American environment.\nCreate a detailed LOCATION SHEET and ONE SEPARATE HIGH-QUALITY LOCATION REFERENCE SHEET IMAGE.\nIt MUST NOT contain storyboard panels, script, dialogue, or characters.\nLOCK THE LOCATION.\n\n============================================================\nSTAGE 4 TO STAGE 11 WORKFLOW\n============================================================\nSTAGE 4: Generate exactly 10 commercial concepts in TEXT ONLY.\nSTAGE 5: Wait for user selection.\nSTAGE 6: Ask duration (15s, 30s, 45s, 50s, 60s).\nSTAGE 7: Write commercial script following: HOOK -> PROBLEM/DESIRE -> PRODUCT -> EXPERIENCE -> BENEFIT -> PAYOFF -> BRAND MESSAGE.\nSTAGE 8: Create Storyboard Plan table.\nSTAGE 9: Create ONE SEPARATE COMPLETE STORYBOARD IMAGE.\nSTAGE 10: Perform Final Consistency Check on all 4 separate assets.\nSTAGE 11: Generate Final Flow AI Agent Master Prompt.\n\nSTART NOW by asking STAGE 1 question ONLY.'
+    },
+    {
+      id: 'prompt-character',
+      title: '2. Prompt de Admisión de Personaje (Character Reference Intake)',
+      desc: 'Pregunta de control con opciones cerradas que impide que la IA invente un personaje por su cuenta. Si el usuario responde YES y sube una fotografía, la IA ejecuta un análisis exhaustivo de rasgos faciales, tono de piel, vestuario, peinado y proporciones corporales, y genera la Ficha de Personaje (Character Sheet) y la Hoja de Referencia Visual, activando el bloqueo definitivo de identidad (Character Lock).',
+      uso: 'Se usa en la Etapa 1 del procedimiento, inmediatamente después de cargar el Master Prompt Principal. Es fundamental en campañas con actores reales, modelos o embajadores de marca: garantiza que el rostro, la edad y el vestuario sean exactamente los mismos en cada plano sin deformaciones entre tomas.',
+      text: 'Do you already have a character image you want to use?\n\nOption 1: YES — I will provide the character image.\nOption 2: NO — I will provide the character image later.'
+    },
+    {
+      id: 'prompt-product',
+      title: '3. Prompt de Admisión de Producto (Product Reference Intake)',
+      desc: 'Pregunta de control que solicita imágenes reales del producto capturadas desde múltiples ángulos (frente, perfil, trasera, vista superior y detalles). La IA analiza dimensiones, materiales, colores, botones, logotipos y acabados para construir la Ficha de Producto (Product Sheet) y la Hoja de Referencia de Producto, fijando un Product Lock.',
+      uso: 'Se usa en la Etapa 2 del procedimiento, después del Character Lock. Permite la representación fiel e hiperrealista de productos comerciales reales (auriculares, cosméticos, tecnología). Asegura que el empaque, el diseño industrial, el logotipo y la identidad visual de la marca no sean alterados ni distorsionados por el generador de video.',
+      text: 'Do you already have a product image you want to use?\n\nOption 1: YES — I will provide the product image.\nOption 2: NO — I will provide the product image later.'
+    },
+    {
+      id: 'prompt-location',
+      title: '4. Prompt de Admisión de Locación (Location Reference Intake)',
+      desc: 'Pregunta de selección de escenario. Permite aportar una fotografía de un espacio específico o autorizar a la IA a diseñar un escenario coherente con el concepto y el público objetivo. Genera la Ficha de Locación (Location Sheet) y su Hoja de Referencia Visual, ejecutando el Location Lock para congelar arquitectura, mobiliario y paleta de colores.',
+      uso: 'Se usa en la Etapa 3 del procedimiento, tras el Product Lock. Mantiene la continuidad espacial y la coherencia arquitectónica o de iluminación (oficina moderna, apartamento, entorno exterior) a lo largo de todas las secuencias del spot comercial.',
+      text: 'Do you already have a location image you want to use?\n\nOption 1: YES — I will provide the location image.\nOption 2: NO — Create the location yourself.'
+    },
+    {
+      id: 'prompt-next',
+      title: '5. Prompt de Avance Secuencial (next)',
+      desc: 'Comando simple de una sola palabra que actúa como señal de aprobación. Indica a ChatGPT que el usuario ha descargado o verificado el activo actual y que la IA debe avanzar a la siguiente etapa del flujo de trabajo.',
+      uso: 'Se escribe en ChatGPT al completar cada entregable (Ficha de Personaje, Ficha de Producto, Ficha de Locación, guión, storyboard). Agiliza la interacción en la preproducción, evitando redactar órdenes complejas en cada paso intermedio y manteniendo la disciplina del proceso secuencial.',
+      text: 'next'
+    },
+    {
+      id: 'prompt-concepts',
+      title: '6. Prompt para Generación y Selección de Conceptos Comerciales',
+      desc: 'La IA genera automáticamente 10 propuestas publicitarias en texto y formula la pregunta de selección. Cada concepto incluye: título de campaña, gancho inicial (hook), problema o deseo del cliente, solución del producto, recompensa emocional o visual, mensaje de marca final y estilo visual recomendado.',
+      uso: 'Se ejecuta en la Etapa 4-5 del procedimiento, después de los tres bloqueos (personaje, producto y locación). Sirve para sesiones de lluvia de ideas y para presentar propuestas a clientes o directores de marca, evaluando 10 ángulos creativos y narrativos diferentes antes de decidir qué video producir.',
+      text: 'Which commercial do you want to create?'
+    },
+    {
+      id: 'prompt-duration',
+      title: '7. Prompt de Selección de Duración del Anuncio',
+      desc: 'Pregunta formulada por la IA con opciones preestablecidas. Establece la duración exacta del spot y sirve como parámetro matemático para determinar la cantidad de tomas necesarias (entre 8 y 12 tomas para un anuncio de 50 a 60 segundos) y ajustar la velocidad de la narrativa.',
+      uso: 'Se responde en la Etapa 6 del procedimiento, tras elegir el concepto. Permite adaptar el guión y el ritmo del anuncio a los estándares de los distintos canales de distribución: formatos breves de 15 segundos para Instagram Reels o TikTok, frente a piezas de 45 a 60 segundos para YouTube o Televisión.',
+      text: 'What duration do you want?\n\nOptions:\n- 15 seconds\n- 30 seconds\n- 45 seconds\n- 50 seconds\n- 60 seconds'
+    },
+    {
+      id: 'prompt-script',
+      title: '8. Prompt de Guión Publicitario y Plan de Storyboard',
+      desc: 'La IA redacta el guión siguiendo la estructura narrativa obligatoria y a continuación crea el plan de storyboard en formato de tabla (número de toma, duración, acción, personajes, producto, locación, locución/diálogo y movimiento de cámara). Finalmente genera la Imagen de Storyboard Completo.',
+      uso: 'Se ejecuta en las Etapas 7-8-9 del procedimiento, después de elegir concepto y duración. Ofrece la estructura narrativa y visual completa a los directores de arte y clientes antes de la fase de renderizado de video, asegurando que cada toma cumpla un propósito claro dentro del anuncio.',
+      text: 'HOOK → PROBLEM / DESIRE → PRODUCT → EXPERIENCE → BENEFIT → PAYOFF → BRAND MESSAGE'
+    },
+    {
+      id: 'prompt-final-flow',
+      title: '9. Master Prompt Final para Agent Mode de Google Flow',
+      desc: 'Prompt consolidado de síntesis que ChatGPT genera al finalizar la Etapa 10. Indica al agente de IA de Google Flow que interprete el guión y las cuatro imágenes de referencia (Personaje, Producto, Locación y Storyboard) como un único plan de producción unificado, respetando la continuidad estética, de iluminación y de personajes en cada segundo del video generado.',
+      uso: 'Se pega en Google Flow en Agent Mode junto con las 4 imágenes de referencia descargadas y vinculadas con "Add to prompt". Automatiza la generación autónoma del comercial completo en video cinematográfico de alta calidad, eliminando la necesidad de redactar manualmente prompts escena por escena.',
+      text: 'Act as an expert AI Commercial Video Production Agent. Generate a high-end cinematic commercial video based on the following authoritative references attached to this project:\n\nAUTHORITATIVE REFERENCES ATTACHED:\n1. Commercial Script: [Script generado en la Etapa 7]\n2. Approved Character Reference Image: [Character Sheet]\n3. Approved Product Reference Image: [Product Sheet]\n4. Approved Location Reference Image: [Location Sheet]\n5. Complete Storyboard Image: [Storyboard Image]\n\nPRODUCTION DIRECTIVES:\n- Treat all attached references as ONE UNIFIED PRODUCTION PLAN.\n- Maintain 100% visual consistency for the character\'s face, hair, age, and wardrobe across all shots.\n- Maintain exact product design, colors, materials, and logo placement in every scene where the product appears.\n- Preserve location architecture, lighting logic, and color palette as defined in the Location Sheet.\n- Follow the exact camera angles, framing, and shot progression defined in the Visual Storyboard.\n- Ensure natural motion, fluid lighting continuity, and accurate dialogue pacing.\n\nGenerate the full commercial sequence maintaining cinematic quality.'
+    },
+    {
+      id: 'prompt-reuse',
+      title: '10. Prompts y Comandos de Ajuste e Iteración (Reuse Prompt)',
+      desc: 'Instrucciones de corrección aplicadas en Google Flow mediante la función Reuse Prompt, combinadas con modificaciones de parámetros o texto. Se utilizan para corregir errores visuales (elementos extraños en pantalla), problemas de ritmo (locuciones cortadas antes de tiempo) o para regenerar un único activo defectuoso sin reiniciar todo el proyecto.',
+      uso: 'Se usan en la fase de control de calidad y resolución de problemas (troubleshooting) en la postproducción publicitaria con IA. En lugar de volver a generar todo el comercial, permiten iterar y corregir tomas específicas, o combinar los mejores fragmentos de distintas generaciones en un editor de video como CapCut o Premiere.',
+      text: 'Regenerate ONLY the Location Sheet without any storyboard panels.\n\nRegenerate ONLY the Location Sheet without any people, products or storyboard panels.\n\nRegenerate the Product Sheet using only the supplied real photos. Do not invent details.\n\nRegenerate ONLY the Character Sheet keeping the exact same face identity from the supplied image.\n\nDo not create a character. Wait for my image.'
+    }
+  ];
+
+  function buildPrompts(){
+    var mount = document.getElementById('promptsMount');
+    if (!mount) return;
+    mount.textContent = '';
+
+    /* --- Índice --- */
+    var idx = document.createElement('nav');
+    idx.className = 'prompt-index';
+    idx.setAttribute('aria-label', 'Índice de prompts');
+
+    var idxTitle = document.createElement('h3');
+    idxTitle.textContent = 'Índice de prompts';
+    idx.appendChild(idxTitle);
+
+    var idxUl = document.createElement('ul');
+    PROMPTS.forEach(function(p){
+      var li = document.createElement('li');
+      var a = document.createElement('a');
+      a.href = '#' + p.id;
+      a.textContent = p.title.replace(/^\d+\.\s*/, '');
+      li.appendChild(a);
+      idxUl.appendChild(li);
+    });
+    idx.appendChild(idxUl);
+    mount.appendChild(idx);
+
+    /* --- Secciones --- */
+    PROMPTS.forEach(function(p){
+      var art = document.createElement('article');
+      art.className = 'prompt-section';
+      art.id = p.id;
+
+      var h = document.createElement('h2');
+      h.textContent = p.title;
+      art.appendChild(h);
+
+      var descP = document.createElement('p');
+      var descStrong = document.createElement('strong');
+      descStrong.textContent = 'Descripción: ';
+      descP.appendChild(descStrong);
+      descP.appendChild(document.createTextNode(p.desc));
+      art.appendChild(descP);
+
+      var usoP = document.createElement('p');
+      var usoStrong = document.createElement('strong');
+      usoStrong.textContent = 'Uso: ';
+      usoP.appendChild(usoStrong);
+      usoP.appendChild(document.createTextNode(p.uso));
+      art.appendChild(usoP);
+
+      var box = document.createElement('div');
+      box.className = 'promptBox';
+
+      var pre = document.createElement('pre');
+      pre.className = 'promptBody';
+      pre.textContent = p.text;
+      box.appendChild(pre);
+
+      var actions = document.createElement('div');
+      actions.className = 'promptActions';
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'copyBtn';
+      btn.textContent = 'Copiar';
+      actions.appendChild(btn);
+
+      box.appendChild(actions);
+      art.appendChild(box);
+      mount.appendChild(art);
+    });
+  }
+
+  /* ==========================================================
+     7. CHECKLIST CON localStorage
+     ========================================================== */
+  var ckBoxes = document.querySelectorAll('.ck-list input[type=checkbox]');
+  var ckFill  = document.getElementById('ckFill');
+  var ckText  = document.getElementById('ckText');
+  var CK_KEY  = 'tut_checklist_v1';
+  var ckState = {};
+
+  try { ckState = JSON.parse(localStorage.getItem(CK_KEY) || '{}') || {}; } catch (e) { ckState = {}; }
+
+  function saveCk() {
+    try { localStorage.setItem(CK_KEY, JSON.stringify(ckState)); } catch (e) {}
+  }
+
+  function renderCk() {
+    var total = ckBoxes.length;
+    var done = 0;
+    Array.prototype.forEach.call(ckBoxes, function (b) {
+      var key = b.getAttribute('data-ck');
+      b.checked = !!ckState[key];
+      if (b.checked) done++;
+    });
+    var pct = total ? Math.round((done / total) * 100) : 0;
+    if (ckFill) ckFill.style.width = pct + '%';
+    if (ckText) ckText.textContent = done + ' de ' + total + ' completados (' + pct + ' %)';
+  }
+
+  Array.prototype.forEach.call(ckBoxes, function (b) {
+    b.addEventListener('change', function () {
+      ckState[b.getAttribute('data-ck')] = b.checked;
+      saveCk();
+      renderCk();
+    });
+  });
+  renderCk();
+
+  var ckReset = document.getElementById('ckReset');
+  if (ckReset) {
+    ckReset.addEventListener('click', function () {
+      ckState = {};
+      saveCk();
+      renderCk();
+    });
+  }
+
+  /* ==========================================================
+     8. BARRA DE PROGRESO + VOLVER ARRIBA
+     ========================================================== */
+  var progressFill = document.getElementById('progressFill');
+  var toTop = document.getElementById('toTop');
+
+  function onScroll() {
+    var doc = document.documentElement;
+    var max = (doc.scrollHeight - window.innerHeight);
+    var pct = max > 0 ? (window.pageYOffset / max) * 100 : 0;
+    if (progressFill) progressFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+    if (toTop) toTop.classList.toggle('show', window.pageYOffset > 400);
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  if (toTop) {
+    toTop.addEventListener('click', function () {
+      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+    });
+  }
+
+  /* ==========================================================
+     9. IMPRESIÓN / PDF
+     ========================================================== */
+  var printPrepared = false;
+  var printRestore = { details: [], svgs: [] };
+  var printFired = false;
+  var inIframe = false;
+
+  try { inIframe = (window.self !== window.top); } catch (e) { inIframe = true; }
+
+  function preparePrint() {
+    if (printPrepared) return;
+    printPrepared = true;
+    printRestore.details = [];
+    printRestore.svgs = [];
+
+    Array.prototype.forEach.call(document.querySelectorAll('details'), function (d) {
+      if (!d.open) {
+        printRestore.details.push(d);
+        d.open = true;
+      }
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll('[data-svg-hero]'), function (m) {
+      mountOne(m);
+      var svg = m.querySelector('svg');
+      if (svg) {
+        try {
+          svg.pauseAnimations();
+          svg.setCurrentTime(0);
+        } catch (e) {}
+        printRestore.svgs.push(svg);
+      }
+    });
+  }
+
+  function finishPrint() {
+    if (!printPrepared) return;
+    printPrepared = false;
+
+    printRestore.details.forEach(function (d) { d.open = false; });
+    printRestore.details = [];
+
+    printRestore.svgs.forEach(function (s) {
+      try { s.unpauseAnimations(); } catch (e) {}
+    });
+    printRestore.svgs = [];
+
+    mountActive();
+  }
+
+  function showPrintNotice() {
+    var n = document.getElementById('printNotice');
+    if (!n) return;
+    n.classList.add('show');
+    clearTimeout(n._t);
+    n._t = setTimeout(function () { n.classList.remove('show'); }, 11000);
+  }
+
+  window.addEventListener('beforeprint', preparePrint);
+  window.addEventListener('afterprint', function () {
+    printFired = true;
+    finishPrint();
+  });
+
+  var closeNotice = document.getElementById('closeNotice');
+  if (closeNotice) {
+    closeNotice.addEventListener('click', function () {
+      var n = document.getElementById('printNotice');
+      if (n) n.classList.remove('show');
+    });
+  }
+
+  var btnPrint = document.getElementById('btnPrint');
+  if (btnPrint) {
+    btnPrint.addEventListener('click', function () {
+      if (inIframe) showPrintNotice();
+
+      preparePrint();
+      printFired = false;
+
+      try {
+        window.print();
+      } catch (e) {
+        showPrintNotice();
+      }
+
+      setTimeout(function () {
+        if (!printFired) showPrintNotice();
+      }, 1600);
+    });
+  }
+
+  /* ==========================================================
+     10. ARRANQUE
+     ========================================================== */
+  function boot() {
+    buildPrompts();
+    bindAllCopyButtons();
+    bindIndexLinks();
+
+    /* CORREGIDO: soporte para arrancar con un hash que apunte a un panel
+       o a un anchor interno (por ejemplo, un prompt concreto). */
+    var id = location.hash ? location.hash.replace('#', '') : '';
+    var el = id ? document.getElementById(id) : null;
+
+    if (el && el.classList.contains('panel')) {
+      activateTab(id, false);
+    } else if (el) {
+      var panel = el.closest ? el.closest('.panel') : null;
+      if (panel) {
+        activateTab(panel.id, false);
+        setTimeout(function () {
+          try { el.scrollIntoView({ behavior: 'auto', block: 'start' }); }
+          catch (e) { el.scrollIntoView(); }
+        }, 30);
+      } else {
+        activateTab('p-inicio', false);
+      }
+    } else {
+      activateTab('p-inicio', false);
+    }
+    mountActive();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+
+  window.addEventListener('load', function () { mountActive(); });
+
+})();
+</script>
+</body>
+</html>
